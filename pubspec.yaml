@@ -1,0 +1,51 @@
+name: cleanreport
+description: "CleanReport V2 - aplikasi lapor sampah (versi gratis: OpenStreetMap + Firebase Spark)."
+publish_to: "none"
+version: 2.0.0+1
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+
+  # Kamera & galeri, lokasi
+  image_picker: ^1.1.2
+  geolocator: ^14.1.2
+  geocoding: ^4.0.0
+
+  # Peta OpenStreetMap (gratis, tanpa kunci API & tanpa kartu)
+  flutter_map: any
+  latlong2: ^0.9.1
+
+  # Notifikasi lokal saat status laporan berubah (gratis, tanpa server)
+  flutter_local_notifications: ^19.5.0
+
+  # Backend Firebase gratis (Auth anonim, Firestore) - versi dikunci otomatis
+  # di pubspec.lock setelah `flutter pub get`.
+  firebase_core: any
+  firebase_auth: any
+  cloud_firestore: any
+
+  # Pendukung: mode lokal (tanpa Firebase), telepon / WhatsApp / Maps
+  shared_preferences: ^2.5.0
+  path_provider: ^2.1.5
+  url_launcher: ^6.3.1
+
+dev_dependencies:
+  flutter_lints: ^4.0.0
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+
+  fonts:
+    - family: AtkinsonHyperlegibleNext
+      fonts:
+        - asset: assets/fonts/AtkinsonHyperlegibleNext.ttf

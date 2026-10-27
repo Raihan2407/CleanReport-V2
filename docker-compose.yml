@@ -1,0 +1,49 @@
+version: '3.9'
+
+services:
+  # Production: requires build/web artifacts (run locally: flutter build web --release)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: cleanreport-app
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+  # Development: full build inside container (slower first run, then cached)
+  app-build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cleanreport-build
+    ports:
+      - "8081:80"
+    restart: unless-stopped
+    profiles:
+      - build
+
+  # Web dev server with hot-reload (requires Flutter SDK locally or Docker build)
+  dev-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: cleanreport-dev
+    ports:
+      - "8082:8080"
+    volumes:
+      - ./lib:/app/lib
+      - ./assets:/app/assets
+      - ./pubspec.yaml:/app/pubspec.yaml
+    environment:
+      - FLUTTER_WEB=true
+    profiles:
+      - dev
+
+

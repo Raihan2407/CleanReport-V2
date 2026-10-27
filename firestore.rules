@@ -1,0 +1,93 @@
+rules_version = '2';
+
+// Aturan keamanan CleanReport V2 (paket gratis, tanpa Cloud Storage).
+// Tempel di Firebase Console -> Firestore Database -> Rules -> Publish.
+// Uji dulu lewat tombol "Rules Playground" bila ada pesan "permission denied".
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // Admin = akun yang punya dokumen admins/{uid} (dibuat manual dari konsol).
+    function isAdmin() {
+      return signedIn() &&
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    function kategoriValid(k) {
+      return k in ['Plastik & Liar', 'Kasur & Perabot', 'Ranting & Puing', 'Berbau / Bangkai'];
+    }
+
+    // Laporan baru dari warga: hanya field yang dikenal, tipe & ukuran dibatasi,
+    // status awal wajib "received", tidak boleh membawa foto sesudah.
+    function laporanValid(d) {
+      return d.keys().hasOnly(['userId', 'kategori', 'patokanLokasi', 'namaPelapor', 'anonim',
+                               'latitude', 'longitude', 'alamatTeks', 'alamatDetail',
+                               'fotoSebelumB64', 'status', 'createdAt', 'updatedAt'])
+        && d.keys().hasAll(['userId', 'kategori', 'patokanLokasi', 'namaPelapor', 'anonim',
+                            'latitude', 'longitude', 'alamatTeks', 'alamatDetail',
+                            'fotoSebelumB64', 'status', 'createdAt', 'updatedAt'])
+        && d.userId == request.auth.uid
+        && d.status == 'received'
+        && kategoriValid(d.kategori)
+        && d.patokanLokasi is string && d.patokanLokasi.size() <= 120
+        && d.namaPelapor is string && d.namaPelapor.size() <= 60
+        && d.anonim is bool
+        && d.latitude is number && d.latitude >= -90 && d.latitude <= 90
+        && d.longitude is number && d.longitude >= -180 && d.longitude <= 180
+        && d.alamatTeks is string && d.alamatTeks.size() <= 200
+        && d.alamatDetail is string && d.alamatDetail.size() <= 300
+        && d.fotoSebelumB64 is string && d.fotoSebelumB64.size() > 0
+        && d.fotoSebelumB64.size() <= 520000
+        && d.createdAt is timestamp && d.updatedAt is timestamp;
+    }
+
+    function titikValid(d) {
+      return d.keys().hasOnly(['userId', 'lat', 'lng', 'kategori', 'status', 'createdAt'])
+        && d.keys().hasAll(['userId', 'lat', 'lng', 'kategori', 'status', 'createdAt'])
+        && d.userId == request.auth.uid
+        && d.status == 'received'
+        && kategoriValid(d.kategori)
+        && d.lat is number && d.lat >= -90 && d.lat <= 90
+        && d.lng is number && d.lng >= -180 && d.lng <= 180
+        && d.createdAt is timestamp;
+    }
+
+    match /admins/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    // Laporan: pelapor (anonim) hanya melihat laporannya sendiri; admin melihat semua.
+    match /reports/{reportId} {
+      allow read: if signedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if signedIn() && laporanValid(request.resource.data);
+      allow update: if isAdmin();
+      allow delete: if false;
+
+      match /statusHistory/{historyId} {
+        allow read: if signedIn() && (isAdmin() ||
+          get(/databases/$(database)/documents/reports/$(reportId)).data.userId == request.auth.uid);
+        // Pelapor hanya boleh membuat catatan awal "received" (di batch yang sama dengan laporan).
+        allow create: if signedIn() && (isAdmin() ||
+          (historyId == 'received'
+            && request.resource.data.keys().hasOnly(['status', 'changedAt', 'catatan'])
+            && request.resource.data.status == 'received'
+            && request.resource.data.catatan == ''
+            && getAfter(/databases/$(database)/documents/reports/$(reportId)).data.userId == request.auth.uid));
+        allow update: if isAdmin();
+        allow delete: if false;
+      }
+    }
+
+    // Titik publik (tanpa foto & nama) untuk peringatan laporan ganda.
+    match /public_points/{pointId} {
+      allow read: if signedIn();
+      allow create: if signedIn() && (isAdmin() || titikValid(request.resource.data));
+      allow update: if isAdmin();
+      allow delete: if false;
+    }
+  }
+}

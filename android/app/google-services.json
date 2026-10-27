@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "834726284889",
+    "project_id": "cleanreport-v2",
+    "storage_bucket": "cleanreport-v2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:834726284889:android:36f94716331642f373ab48",
+        "android_client_info": {
+          "package_name": "id.ac.umrah.cleanreport.v2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_o0enebomQWJomUJbn_3cVbVzHOt4XLc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

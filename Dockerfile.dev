@@ -1,0 +1,29 @@
+# Development Dockerfile with hot-reload support
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install Flutter dependencies
+RUN apk add --no-cache git curl unzip xz bash
+
+# Clone Flutter SDK with retry logic and depth to avoid full history
+RUN for i in 1 2 3; do \
+  git clone --branch stable --depth 1 https://github.com/flutter/flutter.git /flutter && break; \
+  if [ $i -lt 3 ]; then echo "Retry $i failed, trying again..."; sleep 5; fi; \
+done
+
+RUN /flutter/bin/flutter config --enable-web && \
+    /flutter/bin/flutter precache
+
+ENV PATH="/flutter/bin:${PATH}"
+
+# Copy pubspec
+COPY pubspec.yaml pubspec.lock* ./
+RUN flutter pub get
+
+# Copy project
+COPY . .
+
+EXPOSE 8080
+
+CMD ["flutter", "run", "-d", "web-server", "--web-port", "8080", "--release"]
