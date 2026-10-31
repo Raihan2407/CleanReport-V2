@@ -73,7 +73,8 @@ class RoundIcon extends StatelessWidget {
 
 /// Judul bagian bernomor ("1  Foto Sampah  [chip]").
 class StepTitle extends StatelessWidget {
-  const StepTitle({super.key, required this.number, required this.title, this.trailing});
+  const StepTitle(
+      {super.key, required this.number, required this.title, this.trailing});
 
   final int number;
   final String title;
@@ -86,7 +87,8 @@ class StepTitle extends StatelessWidget {
         Container(
           width: 28,
           height: 28,
-          decoration: const BoxDecoration(color: C.green, shape: BoxShape.circle),
+          decoration:
+              const BoxDecoration(color: C.green, shape: BoxShape.circle),
           alignment: Alignment.center,
           child: Text('$number', style: ty(14, 700, color: C.white)),
         ),
@@ -117,7 +119,8 @@ class MiniChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(9999)),
+      decoration:
+          BoxDecoration(color: bg, borderRadius: BorderRadius.circular(9999)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -126,7 +129,9 @@ class MiniChip extends StatelessWidget {
             const SizedBox(width: 4),
           ],
           Flexible(
-            child: Text(text, style: ty(12.5, 700, color: fg), overflow: TextOverflow.ellipsis),
+            child: Text(text,
+                style: ty(12.5, 700, color: fg),
+                overflow: TextOverflow.ellipsis),
           ),
         ],
       ),
@@ -155,13 +160,17 @@ class StatusPill extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(9999)),
+      decoration:
+          BoxDecoration(color: bg, borderRadius: BorderRadius.circular(9999)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, color: iconColor ?? fg, size: 16),
           const SizedBox(width: 6),
-          Flexible(child: Text(label, style: ty(13.5, 700, color: fg), overflow: TextOverflow.ellipsis)),
+          Flexible(
+              child: Text(label,
+                  style: ty(13.5, 700, color: fg),
+                  overflow: TextOverflow.ellipsis)),
         ],
       ),
     );
@@ -176,8 +185,8 @@ class CornerBrackets extends StatelessWidget {
   final double length;
 
   @override
-  Widget build(BuildContext context) =>
-      CustomPaint(painter: _BracketsPainter(color, length), size: Size.infinite);
+  Widget build(BuildContext context) => CustomPaint(
+      painter: _BracketsPainter(color, length), size: Size.infinite);
 }
 
 class _BracketsPainter extends CustomPainter {
@@ -214,10 +223,11 @@ class _BracketsPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_BracketsPainter old) => old.color != color || old.length != length;
+  bool shouldRepaint(_BracketsPainter old) =>
+      old.color != color || old.length != length;
 }
 
-enum ButtonKind { primary, tonal, outline }
+enum ButtonKind { primary, tonal, outline, danger }
 
 /// Tombol standar CleanReport (tinggi nyaman untuk jempol, ada keadaan loading).
 class AppButton extends StatelessWidget {
@@ -244,11 +254,13 @@ class AppButton extends StatelessWidget {
       ButtonKind.primary => C.submit,
       ButtonKind.tonal => C.indigo,
       ButtonKind.outline => C.white,
+      ButtonKind.danger => C.white,
     };
     final fg = switch (kind) {
       ButtonKind.primary => C.white,
       ButtonKind.tonal => C.ink,
       ButtonKind.outline => C.green,
+      ButtonKind.danger => C.red,
     };
     final content = loading
         ? SizedBox(
@@ -259,7 +271,10 @@ class AppButton extends StatelessWidget {
         : Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (icon != null) ...[Icon(icon, size: 20), const SizedBox(width: 8)],
+              if (icon != null) ...[
+                Icon(icon, size: 20),
+                const SizedBox(width: 8)
+              ],
               Flexible(child: Text(label, textAlign: TextAlign.center)),
             ],
           );
@@ -285,7 +300,9 @@ class AppButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(14),
             side: kind == ButtonKind.outline
                 ? const BorderSide(color: C.green, width: 1.5)
-                : BorderSide.none,
+                : kind == ButtonKind.danger
+                    ? const BorderSide(color: C.red, width: 1.5)
+                    : BorderSide.none,
           ),
         ),
         child: content,
@@ -330,7 +347,8 @@ class BackPill extends StatelessWidget {
 
 /// Foto laporan: otomatis memilih jaringan (URL), base64 (Firestore) atau berkas lokal.
 class ReportImage extends StatelessWidget {
-  const ReportImage(this.path, {super.key, this.fit = BoxFit.cover, this.cacheWidth});
+  const ReportImage(this.path,
+      {super.key, this.fit = BoxFit.cover, this.cacheWidth});
 
   final String path;
   final BoxFit fit;
@@ -352,7 +370,8 @@ class ReportImage extends StatelessWidget {
     if (path.startsWith('b64:')) {
       try {
         if (_memory.length > 40) _memory.clear();
-        final bytes = _memory.putIfAbsent(path, () => base64Decode(path.substring(4)));
+        final bytes =
+            _memory.putIfAbsent(path, () => base64Decode(path.substring(4)));
         return Image.memory(
           bytes,
           fit: fit,
@@ -378,7 +397,8 @@ class ReportImage extends StatelessWidget {
                 child: const SizedBox(
                   width: 24,
                   height: 24,
-                  child: CircularProgressIndicator(strokeWidth: 2.5, color: C.green),
+                  child: CircularProgressIndicator(
+                      strokeWidth: 2.5, color: C.green),
                 ),
               ),
         errorBuilder: (_, __, ___) => _placeholder(),
@@ -394,7 +414,8 @@ class ReportImage extends StatelessWidget {
 }
 
 /// Pesan singkat (snackbar) yang konsisten dengan desain.
-void toast(BuildContext context, String message, {bool error = false, SnackBarAction? action}) {
+void toast(BuildContext context, String message,
+    {bool error = false, SnackBarAction? action}) {
   final m = ScaffoldMessenger.of(context);
   m.hideCurrentSnackBar();
   m.showSnackBar(
@@ -410,7 +431,9 @@ void toast(BuildContext context, String message, {bool error = false, SnackBarAc
           Icon(error ? Icons.error_outline : Icons.check_circle_outline,
               color: Colors.white, size: 20),
           const SizedBox(width: 10),
-          Expanded(child: Text(message, style: ty(14, 600, color: Colors.white, lh: 1.3))),
+          Expanded(
+              child: Text(message,
+                  style: ty(14, 600, color: Colors.white, lh: 1.3))),
         ],
       ),
     ),

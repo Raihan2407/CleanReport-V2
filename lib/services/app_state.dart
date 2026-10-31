@@ -57,7 +57,8 @@ class ReportStore extends ChangeNotifier {
     try {
       final o = DefaultFirebaseOptions.currentPlatform;
       if (o.apiKey.isEmpty || o.apiKey.startsWith('ISI_')) return null;
-      await Firebase.initializeApp(options: o).timeout(const Duration(seconds: 10));
+      await Firebase.initializeApp(options: o)
+          .timeout(const Duration(seconds: 10));
       return CloudReportRepository();
     } catch (_) {
       return null;
@@ -140,9 +141,13 @@ class ReportStore extends ChangeNotifier {
           uiChanged = true;
           unawaited(NotifyService.show(
             'CleanReport ${r.code}',
-            r.status == ReportStatus.done
-                ? 'Sampah sudah dibersihkan. Buka untuk melihat hasilnya.'
-                : 'Petugas sedang menuju lokasi laporan Anda.',
+            switch (r.status) {
+              ReportStatus.done =>
+                'Sampah sudah dibersihkan. Buka untuk melihat hasilnya.',
+              ReportStatus.rejected =>
+                'Laporan Anda tidak dapat diproses. Buka untuk melihat alasannya.',
+              _ => 'Petugas sedang menuju lokasi laporan Anda.',
+            },
           ));
         }
       }
@@ -197,6 +202,15 @@ class ReportStore extends ChangeNotifier {
     return report;
   }
 
+  /// Menghapus laporan milik sendiri. Melempar error bila ditolak/gagal.
+  Future<void> deleteReport(Report r) async {
+    await init();
+    await _repo!.delete(r);
+    reports = reports.where((x) => x.id != r.id).toList();
+    updatedIds.remove(r.id);
+    notifyListeners();
+  }
+
   Future<List<StatusEntry>> historyOf(Report r) async {
     try {
       return await _repo!.loadHistory(r);
@@ -208,7 +222,8 @@ class ReportStore extends ChangeNotifier {
   Future<List<NearbyPoint>> nearby(LatLng c) async {
     try {
       await init();
-      return await _repo!.nearby(c.latitude, c.longitude, AppConfig.nearbyMeters);
+      return await _repo!
+          .nearby(c.latitude, c.longitude, AppConfig.nearbyMeters);
     } catch (_) {
       return const [];
     }

@@ -1,1 +1,29 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"cleanreport-v2","appId":"1:834726284889:android:36f94716331642f373ab48","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"cleanreport-v2","configurations":{"android":"1:834726284889:android:36f94716331642f373ab48"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "cleanreport-v2",
+          "appId": "1:834726284889:android:36f94716331642f373ab48",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "cleanreport-v2",
+          "configurations": {
+            "android": "1:834726284889:android:36f94716331642f373ab48"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "public": "admin",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}

@@ -44,6 +44,9 @@ abstract class ReportRepository {
 
   /// Laporan lain (yang belum selesai) dalam radius [meters] dari titik.
   Future<List<NearbyPoint>> nearby(double lat, double lng, double meters);
+
+  /// Menghapus laporan beserta riwayat status dan titik publiknya.
+  Future<void> delete(Report report);
 }
 
 class LocalReportRepository implements ReportRepository {
@@ -119,7 +122,8 @@ class LocalReportRepository implements ReportRepository {
     final all = await load();
     all.removeWhere((r) => r.id == id);
     all.insert(0, report);
-    await prefs.setString(_kReports, jsonEncode(all.map((r) => r.toJson()).toList()));
+    await prefs.setString(
+        _kReports, jsonEncode(all.map((r) => r.toJson()).toList()));
     return report;
   }
 
@@ -127,11 +131,31 @@ class LocalReportRepository implements ReportRepository {
   Future<List<StatusEntry>> loadHistory(Report report) async => report.history;
 
   @override
-  Future<List<NearbyPoint>> nearby(double lat, double lng, double meters) async {
+  Future<void> delete(Report report) async {
+    final prefs = await SharedPreferences.getInstance();
+    final all = await load();
+    all.removeWhere((r) => r.id == report.id);
+    await prefs.setString(
+        _kReports, jsonEncode(all.map((r) => r.toJson()).toList()));
+    // Hapus juga berkas foto di HP.
+    try {
+      if (report.photo.isNotEmpty &&
+          !report.photo.startsWith('b64:') &&
+          !report.photo.startsWith('http')) {
+        final f = File(report.photo);
+        if (await f.exists()) await f.delete();
+      }
+    } catch (_) {}
+  }
+
+  @override
+  Future<List<NearbyPoint>> nearby(
+      double lat, double lng, double meters) async {
     final all = await load();
     final out = <NearbyPoint>[];
     for (final r in all) {
-      if (r.status == ReportStatus.done) continue;
+      if (r.status == ReportStatus.done || r.status == ReportStatus.rejected)
+        continue;
       final d = distanceMeters(lat, lng, r.lat, r.lng);
       if (d <= meters) {
         out.add(NearbyPoint(

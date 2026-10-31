@@ -7,7 +7,7 @@ import 'theme.dart';
 /// Catatan proposal (2.11): hanya [received] yang diberikan sistem saat
 /// laporan tersimpan. [inProgress] dan [done] disiapkan untuk pengembangan
 /// lanjutan (pembaruan oleh petugas).
-enum ReportStatus { received, inProgress, done }
+enum ReportStatus { received, inProgress, done, rejected }
 
 ReportStatus statusFromName(String? name) => ReportStatus.values.firstWhere(
       (s) => s.name == name,
@@ -19,28 +19,47 @@ extension ReportStatusX on ReportStatus {
         ReportStatus.received => 'Laporan Diterima',
         ReportStatus.inProgress => 'Petugas Meluncur',
         ReportStatus.done => 'Sudah Bersih',
+        ReportStatus.rejected => 'Laporan Ditolak',
       };
 
   String get message => switch (this) {
         ReportStatus.received => 'Laporan tersimpan, menunggu ditinjau.',
         ReportStatus.inProgress => 'Petugas sedang menuju lokasi.',
         ReportStatus.done => 'Sampah sudah dibersihkan.',
+        ReportStatus.rejected =>
+          'Laporan tidak dapat diproses. Lihat alasannya.',
       };
 
   IconData get icon => switch (this) {
         ReportStatus.done => Icons.check,
         ReportStatus.inProgress => Icons.local_shipping,
         ReportStatus.received => Icons.inbox,
+        ReportStatus.rejected => Icons.block,
       };
 
-  Color get pillBg => this == ReportStatus.done ? C.greenLight : C.indigo;
-  Color get pillFg => this == ReportStatus.done ? C.greenDeep : C.ink;
-  Color get iconColor => this == ReportStatus.done ? C.greenDeep : C.green;
+  Color get pillBg => switch (this) {
+        ReportStatus.done => C.greenLight,
+        ReportStatus.rejected => const Color(0xFFFFE3E0),
+        _ => C.indigo,
+      };
+
+  Color get pillFg => switch (this) {
+        ReportStatus.done => C.greenDeep,
+        ReportStatus.rejected => const Color(0xFF8A1111),
+        _ => C.ink,
+      };
+
+  Color get iconColor => switch (this) {
+        ReportStatus.done => C.greenDeep,
+        ReportStatus.rejected => C.red,
+        _ => C.green,
+      };
 
   Color get descColor => switch (this) {
         ReportStatus.done => C.green,
         ReportStatus.inProgress => C.greenMid,
         ReportStatus.received => C.olive,
+        ReportStatus.rejected => C.red,
       };
 }
 
@@ -60,7 +79,8 @@ class StatusEntry {
 
   factory StatusEntry.fromJson(Map<String, dynamic> j) => StatusEntry(
         status: statusFromName(j['status'] as String?),
-        at: DateTime.fromMillisecondsSinceEpoch((j['at'] as num?)?.toInt() ?? 0),
+        at: DateTime.fromMillisecondsSinceEpoch(
+            (j['at'] as num?)?.toInt() ?? 0),
         note: (j['note'] as String?) ?? '',
       );
 }
@@ -120,8 +140,9 @@ class Report {
         orElse: () => trashCategories.first,
       );
 
-  String get reporterLabel =>
-      (anonymous || reporterName.trim().isEmpty) ? 'Anonim' : reporterName.trim();
+  String get reporterLabel => (anonymous || reporterName.trim().isEmpty)
+      ? 'Anonim'
+      : reporterName.trim();
 
   /// Teks pada pill status, mis. "Sudah Bersih • 24 Okt".
   String get pillLabel {
@@ -149,8 +170,8 @@ class Report {
       };
 
   factory Report.fromJson(Map<String, dynamic> j) {
-    final created =
-        DateTime.fromMillisecondsSinceEpoch((j['createdAt'] as num?)?.toInt() ?? 0);
+    final created = DateTime.fromMillisecondsSinceEpoch(
+        (j['createdAt'] as num?)?.toInt() ?? 0);
     final rawHistory = (j['history'] as List?) ?? const [];
     final history = rawHistory
         .whereType<Map>()
@@ -233,7 +254,8 @@ class ReportDraft {
 
 /// Opsi jenis sampah pada formulir (empat kategori sesuai proposal).
 class TrashCategory {
-  const TrashCategory({required this.name, required this.sub, required this.icon});
+  const TrashCategory(
+      {required this.name, required this.sub, required this.icon});
 
   final String name;
   final String sub;
@@ -241,8 +263,16 @@ class TrashCategory {
 }
 
 const List<TrashCategory> trashCategories = [
-  TrashCategory(name: 'Plastik & Liar', sub: 'Sampah kantong / bungkus', icon: Icons.shopping_bag),
-  TrashCategory(name: 'Kasur & Perabot', sub: 'Barang bekas besar', icon: Icons.chair),
-  TrashCategory(name: 'Ranting & Puing', sub: 'Sisa pohon / semen', icon: Icons.park),
-  TrashCategory(name: 'Berbau / Bangkai', sub: 'Perlu angkut segera', icon: Icons.warning_amber),
+  TrashCategory(
+      name: 'Plastik & Liar',
+      sub: 'Sampah kantong / bungkus',
+      icon: Icons.shopping_bag),
+  TrashCategory(
+      name: 'Kasur & Perabot', sub: 'Barang bekas besar', icon: Icons.chair),
+  TrashCategory(
+      name: 'Ranting & Puing', sub: 'Sisa pohon / semen', icon: Icons.park),
+  TrashCategory(
+      name: 'Berbau / Bangkai',
+      sub: 'Perlu angkut segera',
+      icon: Icons.warning_amber),
 ];

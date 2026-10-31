@@ -72,7 +72,8 @@ class CloudReportRepository implements ReportRepository {
       pending: d.metadata.hasPendingWrites,
       history: [
         StatusEntry(status: ReportStatus.received, at: created),
-        if (status != ReportStatus.received) StatusEntry(status: status, at: updated),
+        if (status != ReportStatus.received)
+          StatusEntry(status: status, at: updated),
       ],
     );
   }
@@ -199,8 +200,41 @@ class CloudReportRepository implements ReportRepository {
     return list.isEmpty ? report.history : list;
   }
 
+  /// Hapus laporan + riwayat status + titik publik + catat log, dalam satu batch.
+  /// Aturan Firestore: pelapor hanya boleh menghapus saat status "received" atau "rejected";
+  /// admin boleh menghapus apa pun. Offline: penghapusan diantre dan terkirim nanti.
   @override
-  Future<List<NearbyPoint>> nearby(double lat, double lng, double meters) async {
+  Future<void> delete(Report report) async {
+    final uid = await _uid();
+    final doc = _db.collection('reports').doc(report.id);
+    final batch = _db.batch();
+    for (final s in const ['received', 'inProgress', 'done', 'rejected']) {
+      batch.delete(doc.collection('statusHistory').doc(s));
+    }
+    batch.delete(_db.collection('public_points').doc(report.id));
+    batch.delete(doc);
+    // Log penghapusan (hanya id, kode, status, waktu; tanpa isi laporan).
+    batch.set(_db.collection('audit_log').doc(), {
+      'laporanId': report.id,
+      'kode': report.code,
+      'aksi': 'hapus',
+      'peran': 'pelapor',
+      'uid': uid,
+      'email': '',
+      'status': report.status.name,
+      'waktu': Timestamp.now(),
+      'alasan': '',
+    });
+    try {
+      await batch.commit().timeout(const Duration(seconds: 6));
+    } on TimeoutException {
+      // Tersimpan di HP dan akan dihapus di server saat internet kembali.
+    }
+  }
+
+  @override
+  Future<List<NearbyPoint>> nearby(
+      double lat, double lng, double meters) async {
     final uid = await _uid();
     final dLat = meters / 111320.0;
     final snap = await _db
@@ -214,7 +248,8 @@ class CloudReportRepository implements ReportRepository {
     for (final d in snap.docs) {
       final m = d.data();
       final status = statusFromName(m['status'] as String?);
-      if (status == ReportStatus.done) continue;
+      if (status == ReportStatus.done || status == ReportStatus.rejected)
+        continue;
       final plat = (m['lat'] as num?)?.toDouble() ?? 0;
       final plng = (m['lng'] as num?)?.toDouble() ?? 0;
       final dist = distanceMeters(lat, lng, plat, plng);

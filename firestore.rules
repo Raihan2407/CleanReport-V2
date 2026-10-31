@@ -20,6 +20,14 @@ service cloud.firestore {
       return k in ['Plastik & Liar', 'Kasur & Perabot', 'Ranting & Puing', 'Berbau / Bangkai'];
     }
 
+    // Pelapor boleh menghapus laporannya sendiri selama belum ditangani
+    // ("received") atau sudah ditolak ("rejected"). get() membaca keadaan SEBELUM
+    // batch, jadi aman dipakai saat laporan dihapus bersamaan.
+    function ownerCanDelete(reportId) {
+      let r = get(/databases/$(database)/documents/reports/$(reportId)).data;
+      return r.userId == request.auth.uid && r.status in ['received', 'rejected'];
+    }
+
     // Laporan baru dari warga: hanya field yang dikenal, tipe & ukuran dibatasi,
     // status awal wajib "received", tidak boleh membawa foto sesudah.
     function laporanValid(d) {
@@ -55,6 +63,22 @@ service cloud.firestore {
         && d.createdAt is timestamp;
     }
 
+    // Log penghapusan: hanya id, kode, status, waktu, dan siapa; tanpa isi laporan.
+    function logValid(d) {
+      return d.keys().hasOnly(['laporanId', 'kode', 'aksi', 'peran', 'uid', 'email', 'status', 'waktu', 'alasan'])
+        && d.keys().hasAll(['laporanId', 'kode', 'aksi', 'peran', 'uid', 'email', 'status', 'waktu', 'alasan'])
+        && d.aksi == 'hapus'
+        && d.uid == request.auth.uid
+        && d.laporanId is string && d.laporanId.size() > 0 && d.laporanId.size() <= 100
+        && d.kode is string && d.kode.size() <= 20
+        && d.email is string && d.email.size() <= 120
+        && d.alasan is string && d.alasan.size() <= 200
+        && d.status in ['received', 'inProgress', 'done', 'rejected']
+        && d.waktu is timestamp
+        && ((d.peran == 'admin' && isAdmin())
+            || (d.peran == 'pelapor' && ownerCanDelete(d.laporanId)));
+    }
+
     match /admins/{uid} {
       allow read: if signedIn() && request.auth.uid == uid;
       allow write: if false;
@@ -65,7 +89,8 @@ service cloud.firestore {
       allow read: if signedIn() && (resource.data.userId == request.auth.uid || isAdmin());
       allow create: if signedIn() && laporanValid(request.resource.data);
       allow update: if isAdmin();
-      allow delete: if false;
+      allow delete: if signedIn() && (isAdmin() ||
+        (resource.data.userId == request.auth.uid && resource.data.status in ['received', 'rejected']));
 
       match /statusHistory/{historyId} {
         allow read: if signedIn() && (isAdmin() ||
@@ -78,7 +103,7 @@ service cloud.firestore {
             && request.resource.data.catatan == ''
             && getAfter(/databases/$(database)/documents/reports/$(reportId)).data.userId == request.auth.uid));
         allow update: if isAdmin();
-        allow delete: if false;
+        allow delete: if signedIn() && (isAdmin() || ownerCanDelete(reportId));
       }
     }
 
@@ -87,7 +112,15 @@ service cloud.firestore {
       allow read: if signedIn();
       allow create: if signedIn() && (isAdmin() || titikValid(request.resource.data));
       allow update: if isAdmin();
-      allow delete: if false;
+      allow delete: if signedIn() && (isAdmin() ||
+        (resource.data.userId == request.auth.uid && resource.data.status in ['received', 'rejected']));
+    }
+
+    // Log penghapusan: hanya admin yang boleh membaca; tidak bisa diubah/dihapus.
+    match /audit_log/{logId} {
+      allow read: if isAdmin();
+      allow create: if signedIn() && logValid(request.resource.data);
+      allow update, delete: if false;
     }
   }
 }

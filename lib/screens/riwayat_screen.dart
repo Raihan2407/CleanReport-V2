@@ -8,7 +8,7 @@ import '../widgets/brand_header.dart';
 import '../widgets/common.dart';
 import 'detail_screen.dart';
 
-enum _Filter { all, processing, done }
+enum _Filter { all, processing, done, rejected }
 
 /// Halaman Riwayat: daftar laporan milik pengguna + filter status.
 class RiwayatScreen extends StatefulWidget {
@@ -27,12 +27,19 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
       listenable: store,
       builder: (context, _) {
         final all = store.reports;
-        final processing = all.where((r) => r.status != ReportStatus.done).toList();
+        final processing = all
+            .where((r) =>
+                r.status == ReportStatus.received ||
+                r.status == ReportStatus.inProgress)
+            .toList();
         final done = all.where((r) => r.status == ReportStatus.done).toList();
+        final rejected =
+            all.where((r) => r.status == ReportStatus.rejected).toList();
         final shown = switch (_filter) {
           _Filter.all => all,
           _Filter.processing => processing,
           _Filter.done => done,
+          _Filter.rejected => rejected,
         };
 
         return Column(
@@ -48,12 +55,14 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
                   children: [
                     _title(all.length),
                     const SizedBox(height: 16),
-                    _filters(all.length, processing.length, done.length),
+                    _filters(all.length, processing.length, done.length,
+                        rejected.length),
                     const SizedBox(height: 16),
                     if (store.loading && all.isEmpty)
                       const Padding(
                         padding: EdgeInsets.symmetric(vertical: 64),
-                        child: Center(child: CircularProgressIndicator(color: C.green)),
+                        child: Center(
+                            child: CircularProgressIndicator(color: C.green)),
                       )
                     else if (store.error != null && all.isEmpty)
                       _errorState()
@@ -98,7 +107,7 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
     );
   }
 
-  Widget _filters(int all, int processing, int done) {
+  Widget _filters(int all, int processing, int done, int rejected) {
     Widget chip(_Filter f, String label, int n) {
       final selected = _filter == f;
       return Expanded(
@@ -116,7 +125,8 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
                 '$label ($n)',
                 textAlign: TextAlign.center,
                 maxLines: 2,
-                style: ty(13.5, 700, color: selected ? C.white : C.ink, lh: 1.2),
+                style:
+                    ty(13.5, 700, color: selected ? C.white : C.ink, lh: 1.2),
               ),
             ),
           ),
@@ -131,6 +141,10 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
         chip(_Filter.processing, 'Sedang Diproses', processing),
         const SizedBox(width: 8),
         chip(_Filter.done, 'Sudah Bersih', done),
+        if (rejected > 0) ...[
+          const SizedBox(width: 8),
+          chip(_Filter.rejected, 'Ditolak', rejected),
+        ],
       ],
     );
   }
@@ -149,7 +163,9 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
           ),
           const SizedBox(height: 18),
           Text(
-            noReportsAtAll ? 'Belum ada laporan' : 'Tidak ada laporan di kategori ini',
+            noReportsAtAll
+                ? 'Belum ada laporan'
+                : 'Tidak ada laporan di kategori ini',
             textAlign: TextAlign.center,
             style: ty(19, 700),
           ),
@@ -179,9 +195,12 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
             iconSize: 40,
           ),
           const SizedBox(height: 18),
-          Text('Riwayat belum bisa dimuat', style: ty(19, 700), textAlign: TextAlign.center),
+          Text('Riwayat belum bisa dimuat',
+              style: ty(19, 700), textAlign: TextAlign.center),
           const SizedBox(height: 6),
-          Text(store.error ?? '', textAlign: TextAlign.center, style: ty(14.5, 400, color: C.slate, lh: 1.4)),
+          Text(store.error ?? '',
+              textAlign: TextAlign.center,
+              style: ty(14.5, 400, color: C.slate, lh: 1.4)),
           const SizedBox(height: 16),
           AppButton(
             label: 'Coba Lagi',
@@ -198,7 +217,8 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
   Widget _hint() {
     return Container(
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: C.indigo, borderRadius: BorderRadius.circular(14)),
+      decoration: BoxDecoration(
+          color: C.indigo, borderRadius: BorderRadius.circular(14)),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -227,7 +247,8 @@ class _ReportCard extends StatelessWidget {
     return SectionCard(
       padding: const EdgeInsets.all(16),
       onTap: () => Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => DetailScreen(reportId: r.id, initial: r)),
+        MaterialPageRoute(
+            builder: (_) => DetailScreen(reportId: r.id, initial: r)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -265,12 +286,19 @@ class _ReportCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(r.addressTitle,
-                        maxLines: 2, overflow: TextOverflow.ellipsis, style: ty(17, 700, lh: 1.25)),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: ty(17, 700, lh: 1.25)),
                     const SizedBox(height: 3),
-                    Text(reportedAgo(r.createdAt), style: ty(13.5, 400, color: C.slate)),
+                    Text(reportedAgo(r.createdAt),
+                        style: ty(13.5, 400, color: C.slate)),
                     const SizedBox(height: 6),
-                    Text(r.pending ? 'Tersimpan di HP, menunggu internet.' : r.status.message,
-                        style: ty(13.5, 600, color: r.status.descColor, lh: 1.3)),
+                    Text(
+                        r.pending
+                            ? 'Tersimpan di HP, menunggu internet.'
+                            : r.status.message,
+                        style:
+                            ty(13.5, 600, color: r.status.descColor, lh: 1.3)),
                     if (r.pending || store.updatedIds.contains(r.id)) ...[
                       const SizedBox(height: 8),
                       if (store.updatedIds.contains(r.id))

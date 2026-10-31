@@ -14,7 +14,8 @@ import '../widgets/common.dart';
 /// Detail satu laporan: foto bukti (sebelum/sesudah), perjalanan status,
 /// lokasi, dan aksi. Mengikuti perubahan realtime dari admin.
 class DetailScreen extends StatefulWidget {
-  const DetailScreen({super.key, required this.reportId, required this.initial});
+  const DetailScreen(
+      {super.key, required this.reportId, required this.initial});
 
   final String reportId;
   final Report initial;
@@ -25,16 +26,58 @@ class DetailScreen extends StatefulWidget {
 
 class _DetailScreenState extends State<DetailScreen> {
   bool _showAfter = true;
+  bool _deleting = false;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => store.markSeen(widget.reportId));
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => store.markSeen(widget.reportId));
   }
 
   void _goTab(int i) {
     store.tab.value = i;
     Navigator.of(context).popUntil((r) => r.isFirst);
+  }
+
+  Future<void> _confirmDelete(Report r) async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: C.white,
+        title: Text('Hapus laporan?', style: ty(20, 700)),
+        content: Text(
+          'Laporan ${r.code} akan dihapus permanen dan tidak bisa dikembalikan.',
+          style: ty(15, 400, color: C.slate, lh: 1.4),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text('Batal', style: ty(15, 700, color: C.slate)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text('Hapus', style: ty(15, 700, color: C.red)),
+          ),
+        ],
+      ),
+    );
+    if (ok != true || !mounted) return;
+    setState(() => _deleting = true);
+    try {
+      await store.deleteReport(r);
+      if (!mounted) return;
+      toast(context, 'Laporan ${r.code} dihapus.');
+      Navigator.of(context).pop();
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _deleting = false);
+      toast(
+        context,
+        'Laporan tidak bisa dihapus. Mungkin sudah ditangani petugas atau koneksi bermasalah.',
+        error: true,
+      );
+    }
   }
 
   Report _current() {
@@ -101,11 +144,25 @@ class _DetailScreenState extends State<DetailScreen> {
                     ),
                     const SizedBox(height: 12),
                     AppButton(
-                      label: 'Masih ada sampah? Hubungi Petugas (${AppConfig.helpNumber})',
+                      label:
+                          'Masih ada sampah? Hubungi Petugas (${AppConfig.helpNumber})',
                       icon: Icons.call,
                       kind: ButtonKind.outline,
-                      onPressed: () => openUrl(context, 'tel:${AppConfig.helpNumber}'),
+                      onPressed: () =>
+                          openUrl(context, 'tel:${AppConfig.helpNumber}'),
                     ),
+                    // Pelapor bisa menghapus selama laporan belum ditangani petugas atau sudah ditolak.
+                    if (r.status == ReportStatus.received ||
+                        r.status == ReportStatus.rejected) ...[
+                      const SizedBox(height: 12),
+                      AppButton(
+                        label: 'Hapus Laporan Ini',
+                        icon: Icons.delete_outline,
+                        kind: ButtonKind.danger,
+                        loading: _deleting,
+                        onPressed: () => _confirmDelete(r),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -233,7 +290,8 @@ class _DetailScreenState extends State<DetailScreen> {
   }
 
   Widget _toggle() {
-    Widget item(String label, IconData icon, bool selected, VoidCallback onTap) {
+    Widget item(
+        String label, IconData icon, bool selected, VoidCallback onTap) {
       return Expanded(
         child: Material(
           color: selected ? C.green : C.indigo,
@@ -249,7 +307,8 @@ class _DetailScreenState extends State<DetailScreen> {
                 children: [
                   Icon(icon, size: 18, color: selected ? C.white : C.ink),
                   const SizedBox(width: 6),
-                  Text(label, style: ty(14, 700, color: selected ? C.white : C.ink)),
+                  Text(label,
+                      style: ty(14, 700, color: selected ? C.white : C.ink)),
                 ],
               ),
             ),
@@ -260,7 +319,8 @@ class _DetailScreenState extends State<DetailScreen> {
 
     return Row(
       children: [
-        item('Setelah (Bersih)', Icons.verified, _showAfter, () => setState(() => _showAfter = true)),
+        item('Setelah (Bersih)', Icons.verified, _showAfter,
+            () => setState(() => _showAfter = true)),
         const SizedBox(width: 8),
         item('Sebelum Lapor', Icons.warning_amber, !_showAfter,
             () => setState(() => _showAfter = false)),
@@ -284,6 +344,41 @@ class _DetailScreenState extends State<DetailScreen> {
               if (h.status == s) return h;
             }
             return null;
+          }
+
+          // Laporan ditolak: tampilkan alasan dari admin, bukan langkah penanganan.
+          if (r.status == ReportStatus.rejected) {
+            final rej = entryOf(ReportStatus.rejected);
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.timeline, color: C.green, size: 24),
+                    const SizedBox(width: 10),
+                    Expanded(
+                        child: Text('Perjalanan Laporan Anda',
+                            style: ty(19, 700, lh: 1.2))),
+                  ],
+                ),
+                const SizedBox(height: 18),
+                _TimelineStep(
+                  data: const _StepData(
+                    status: ReportStatus.received,
+                    title: 'Laporan Diterima',
+                    desc:
+                        'Laporan Anda masuk dan tersimpan di sistem CleanReport.',
+                    icon: Icons.check,
+                  ),
+                  number: 1,
+                  reached: true,
+                  nextReached: true,
+                  isLast: false,
+                  entry: entryOf(ReportStatus.received),
+                ),
+                _RejectedStep(reason: rej?.note.trim() ?? '', at: rej?.at),
+              ],
+            );
           }
 
           final steps = <_StepData>[
@@ -315,7 +410,9 @@ class _DetailScreenState extends State<DetailScreen> {
                 children: [
                   const Icon(Icons.timeline, color: C.green, size: 24),
                   const SizedBox(width: 10),
-                  Expanded(child: Text('Perjalanan Laporan Anda', style: ty(19, 700, lh: 1.2))),
+                  Expanded(
+                      child: Text('Perjalanan Laporan Anda',
+                          style: ty(19, 700, lh: 1.2))),
                 ],
               ),
               const SizedBox(height: 18),
@@ -346,7 +443,9 @@ class _DetailScreenState extends State<DetailScreen> {
           children: [
             Icon(icon, size: 20, color: C.green),
             const SizedBox(width: 12),
-            SizedBox(width: 96, child: Text(label, style: ty(14, 500, color: C.slate))),
+            SizedBox(
+                width: 96,
+                child: Text(label, style: ty(14, 500, color: C.slate))),
             Expanded(child: Text(value, style: ty(15, 700, lh: 1.3))),
           ],
         ),
@@ -357,9 +456,11 @@ class _DetailScreenState extends State<DetailScreen> {
       padding: const EdgeInsets.fromLTRB(20, 14, 20, 14),
       child: Column(
         children: [
-          row(Icons.delete_outline, 'Jenis', r.category.isEmpty ? '-' : r.category),
+          row(Icons.delete_outline, 'Jenis',
+              r.category.isEmpty ? '-' : r.category),
           const Divider(height: 1, color: C.indigo),
-          row(Icons.flag_outlined, 'Patokan', r.landmark.isEmpty ? '-' : r.landmark),
+          row(Icons.flag_outlined, 'Patokan',
+              r.landmark.isEmpty ? '-' : r.landmark),
           const Divider(height: 1, color: C.indigo),
           row(Icons.person_outline, 'Pelapor', r.reporterLabel),
         ],
@@ -388,7 +489,8 @@ class _DetailScreenState extends State<DetailScreen> {
           const SizedBox(height: 2),
           Text(r.addressSub, style: ty(14, 400, color: C.slate, lh: 1.35)),
           const SizedBox(height: 4),
-          Text('Koordinat: ${fmtCoord(r.lat, r.lng)}', style: ty(12.5, 500, color: C.muted)),
+          Text('Koordinat: ${fmtCoord(r.lat, r.lng)}',
+              style: ty(12.5, 500, color: C.muted)),
           const SizedBox(height: 14),
           AppButton(
             label: 'Buka di Google Maps',
@@ -449,7 +551,12 @@ class _TimelineStep extends StatelessWidget {
             width: 40,
             child: Column(
               children: [
-                RoundIcon(icon: data.icon, bg: circleBg, fg: circleFg, size: 40, iconSize: 20),
+                RoundIcon(
+                    icon: data.icon,
+                    bg: circleBg,
+                    fg: circleFg,
+                    size: 40,
+                    iconSize: 20),
                 if (!isLast)
                   Expanded(
                     child: Container(
@@ -473,17 +580,24 @@ class _TimelineStep extends StatelessWidget {
                 children: [
                   Text(
                     '$number. ${data.title}',
-                    style: ty(17, 700, color: reached ? (done ? C.green : C.ink) : C.muted, lh: 1.25),
+                    style: ty(17, 700,
+                        color: reached ? (done ? C.green : C.ink) : C.muted,
+                        lh: 1.25),
                   ),
                   const SizedBox(height: 6),
                   if (reached && entry != null)
-                    MiniChip(text: fmtDateTime(entry!.at), bg: C.indigo, fg: C.slate)
+                    MiniChip(
+                        text: fmtDateTime(entry!.at), bg: C.indigo, fg: C.slate)
                   else if (!reached)
-                    const MiniChip(text: 'Menunggu', bg: C.indigoSoft, fg: C.muted),
+                    const MiniChip(
+                        text: 'Menunggu', bg: C.indigoSoft, fg: C.muted),
                   const SizedBox(height: 6),
                   Text(
-                    reached ? data.desc : 'Akan diperbarui setelah petugas menindaklanjuti.',
-                    style: ty(14, 400, color: reached ? C.slate : C.muted, lh: 1.4),
+                    reached
+                        ? data.desc
+                        : 'Akan diperbarui setelah petugas menindaklanjuti.',
+                    style: ty(14, 400,
+                        color: reached ? C.slate : C.muted, lh: 1.4),
                   ),
                   if (reached && note.isNotEmpty) ...[
                     const SizedBox(height: 8),
@@ -497,7 +611,8 @@ class _TimelineStep extends StatelessWidget {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(Icons.chat_bubble_outline, size: 16, color: C.slate),
+                          const Icon(Icons.chat_bubble_outline,
+                              size: 16, color: C.slate),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
@@ -515,6 +630,76 @@ class _TimelineStep extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _RejectedStep extends StatelessWidget {
+  const _RejectedStep({required this.reason, required this.at});
+
+  final String reason;
+  final DateTime? at;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const RoundIcon(
+          icon: Icons.block,
+          bg: Color(0xFFFFE3E0),
+          fg: C.red,
+          size: 40,
+          iconSize: 20,
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('2. Laporan Ditolak',
+                  style: ty(17, 700, color: C.red, lh: 1.25)),
+              const SizedBox(height: 6),
+              if (at != null)
+                MiniChip(text: fmtDateTime(at!), bg: C.indigo, fg: C.slate),
+              const SizedBox(height: 6),
+              Text(
+                'Laporan ini tidak dapat diproses oleh petugas.',
+                style: ty(14, 400, color: C.slate, lh: 1.4),
+              ),
+              const SizedBox(height: 8),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFF1F0),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(Icons.info_outline, size: 16, color: C.red),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        reason.isEmpty
+                            ? 'Alasan tidak dicantumkan.'
+                            : 'Alasan: $reason',
+                        style: ty(13.5, 500, color: C.ink, lh: 1.4),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Anda dapat menghapus laporan ini lalu membuat laporan baru bila perlu.',
+                style: ty(13, 500, color: C.muted, lh: 1.4),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

@@ -72,4 +72,8 @@ build/
 # Local IDE settings
 .idea/
 .vscode/
+# Abaikan dokumentasi internal
 *.md
+
+# Tetap izinkan README utama
+!README.md
