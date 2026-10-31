@@ -54,7 +54,7 @@
 | **Kelompok** | 7 |
 | **Program studi** | Teknik Informatika, Jurusan Teknik Informatika dan Elektro |
 | **Fakultas / Universitas** | Fakultas Teknik dan Teknologi Kemaritiman, Universitas Maritim Raja Ali Haji (2026) |
-| **Repositori** | https://github.com/Kristian1405/Project-PPB |
+| **Repositori** | https://github.com/Raihan2407/CleanReport-V2.git |
 | **Desain Figma** | https://www.figma.com/design/wUShKqpBL5RW2qcGGKlrod/PPB |
 
 ### Tim
