@@ -16,8 +16,8 @@ Widget osmTiles() => TileLayer(
     );
 
 /// Atribusi wajib OpenStreetMap.
-Widget osmAttribution() => RichAttributionWidget(
-      attributions: [TextSourceAttribution('OpenStreetMap contributors')],
+Widget osmAttribution() => const RichAttributionWidget(
+      attributions: const [TextSourceAttribution('OpenStreetMap contributors')],
     );
 
 /// Pin merah penanda titik laporan (ujung bawah pin = titik koordinat).
@@ -76,7 +76,7 @@ class MapPreview extends StatelessWidget {
           options: MapOptions(
             initialCenter: point,
             initialZoom: AppConfig.mapZoom,
-            interactionOptions: InteractionOptions(flags: InteractiveFlag.none),
+            interactionOptions: const InteractionOptions(flags: InteractiveFlag.none),
           ),
           children: [
             osmTiles(),
@@ -198,7 +198,7 @@ class _LiveMapState extends State<LiveMap> {
                     options: MapOptions(
                       initialCenter: widget.point ?? lp ?? AppConfig.defaultCenter,
                       initialZoom: AppConfig.mapZoom,
-                      interactionOptions: InteractionOptions(flags: InteractiveFlag.none),
+                      interactionOptions: const InteractionOptions(flags: InteractiveFlag.none),
                       onMapReady: () {
                         _ready = true;
                         _maybeMove();

@@ -114,7 +114,7 @@ class _PickLocationScreenState extends State<PickLocationScreen> {
                   initialCenter: widget.initial,
                   initialZoom: AppConfig.mapZoom,
                   interactionOptions:
-                      InteractionOptions(flags: InteractiveFlag.all & ~InteractiveFlag.rotate),
+                      const InteractionOptions(flags: InteractiveFlag.all & ~InteractiveFlag.rotate),
                   onMapReady: () => _ready = true,
                   onPositionChanged: (camera, hasGesture) {
                     if (hasGesture) _onMoved(camera.center);

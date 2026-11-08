@@ -602,7 +602,7 @@ class _LaporScreenState extends State<LaporScreen> with WidgetsBindingObserver {
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    'Akurasi GPS masih rendah (±${acc!.round()} m). Pindah ke tempat terbuka dan tunggu beberapa detik, atau geser pin lewat "Ubah Titik".',
+                    'Akurasi GPS masih rendah (±${acc.round()} m). Pindah ke tempat terbuka dan tunggu beberapa detik, atau geser pin lewat "Ubah Titik".',
                     style: ty(13, 500, color: const Color(0xFF8A5A00), lh: 1.35),
                   ),
                 ),
