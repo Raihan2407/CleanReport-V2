@@ -564,33 +564,33 @@ Kolom **Hasil** diisi tim setelah menjalankan pengujian pada perangkat uji.
 
 | ID | Fitur | Skenario | Langkah | Hasil diharapkan | Hasil |
 |---|---|---|---|---|---|
-| PU-01 | Navigasi | Berpindah halaman | Buka aplikasi; pilih tab Riwayat dan Lapor | Halaman tampil sesuai tab | ⬜ |
-| PU-02 | Foto | Mengambil foto (positif) | Ambil Foto, lalu ambil | Pratinjau foto tampil | ⬜ |
-| PU-03 | Foto | Pemilihan dibatalkan (negatif) | Buka galeri, lalu batalkan | Aplikasi stabil; pesan foto diperlukan | ⬜ |
-| PU-04 | Lokasi | Izin diberikan (positif) | Izinkan lokasi | Koordinat, alamat, dan titik pada peta tampil | ⬜ |
-| PU-05 | Lokasi | Izin ditolak (negatif) | Tolak izin lokasi | Pesan dan penentuan titik manual | ⬜ |
-| PU-06 | Formulir | Pilih jenis sampah | Pilih satu kategori | Kategori terbawa ke pengiriman | ⬜ |
-| PU-07 | Formulir | Data tidak lengkap (negatif) | Kirim tanpa foto, lokasi, atau jenis | Pesan validasi; laporan tidak tersimpan | ⬜ |
-| PU-08 | Pengiriman | Data valid (positif) | Lengkapi data, lalu Kirim | Laporan tersimpan berstatus "Laporan Diterima" | ⬜ |
-| PU-09 | Pengiriman | Koneksi terputus (negatif) | Matikan internet, lalu Kirim | Laporan tersimpan dan terkirim otomatis saat internet kembali (penanda "Menunggu internet") | ⬜ |
-| PU-10 | Riwayat | Data tersedia (positif) | Buka Riwayat | Daftar laporan milik pengguna | ⬜ |
-| PU-11 | Riwayat | Data tidak tersedia (negatif) | Buka Riwayat tanpa laporan | Pesan "Belum ada laporan" | ⬜ |
-| PU-12 | Riwayat | Filter status | Pilih filter | Daftar sesuai status | ⬜ |
-| PU-13 | Detail | Buka detail | Pilih laporan | Foto, status, linimasa, dan lokasi sesuai data | ⬜ |
-| PU-14 | Identitas | Pengguna anonim | Buka aplikasi pertama kali | Identitas anonim dibuat; laporan hanya terlihat oleh pemilik | ⬜ |
+| PU-01 | Navigasi | Berpindah halaman | Buka aplikasi; pilih tab Riwayat dan Lapor | Halaman tampil sesuai tab | ✅ |
+| PU-02 | Foto | Mengambil foto (positif) | Ambil Foto, lalu ambil | Pratinjau foto tampil | ✅ |
+| PU-03 | Foto | Pemilihan dibatalkan (negatif) | Buka galeri, lalu batalkan | Aplikasi stabil; pesan foto diperlukan | ✅ |
+| PU-04 | Lokasi | Izin diberikan (positif) | Izinkan lokasi | Koordinat, alamat, dan titik pada peta tampil | ✅ |
+| PU-05 | Lokasi | Izin ditolak (negatif) | Tolak izin lokasi | Pesan dan penentuan titik manual | ✅ |
+| PU-06 | Formulir | Pilih jenis sampah | Pilih satu kategori | Kategori terbawa ke pengiriman | ✅ |
+| PU-07 | Formulir | Data tidak lengkap (negatif) | Kirim tanpa foto, lokasi, atau jenis | Pesan validasi; laporan tidak tersimpan | ✅ |
+| PU-08 | Pengiriman | Data valid (positif) | Lengkapi data, lalu Kirim | Laporan tersimpan berstatus "Laporan Diterima" | ✅ |
+| PU-09 | Pengiriman | Koneksi terputus (negatif) | Matikan internet, lalu Kirim | Laporan tersimpan dan terkirim otomatis saat internet kembali (penanda "Menunggu internet") | ✅ |
+| PU-10 | Riwayat | Data tersedia (positif) | Buka Riwayat | Daftar laporan milik pengguna | ✅ |
+| PU-11 | Riwayat | Data tidak tersedia (negatif) | Buka Riwayat tanpa laporan | Pesan "Belum ada laporan" | ✅ |
+| PU-12 | Riwayat | Filter status | Pilih filter | Daftar sesuai status | ✅ |
+| PU-13 | Detail | Buka detail | Pilih laporan | Foto, status, linimasa, dan lokasi sesuai data | ✅ |
+| PU-14 | Identitas | Pengguna anonim | Buka aplikasi pertama kali | Identitas anonim dibuat; laporan hanya terlihat oleh pemilik | ✅ |
 
 ### Skenario tambahan
 
 | ID | Skenario | Hasil diharapkan | Hasil |
 |---|---|---|---|
-| PT-01 | Berjalan kaki beberapa meter | Titik biru bergerak dan angka akurasi berubah | ⬜ |
-| PT-02 | Laporan kedua di titik yang sama | Kartu "Ada laporan lain di dekat sini" muncul | ⬜ |
-| PT-03 | Admin mengubah status | Riwayat warga berubah tanpa tarik layar; notifikasi dan penanda muncul | ⬜ |
-| PT-04 | Admin menolak tanpa alasan | Panel menolak; dengan alasan, warga melihat alasan di Detail | ⬜ |
-| PT-05 | Warga menghapus saat status diproses | Tombol hapus tidak tersedia | ⬜ |
-| PT-06 | Admin menghapus laporan | Laporan hilang dan entri muncul di Log penghapusan | ⬜ |
-| PT-07 | Kirim 11 laporan dalam sehari | Pesan batas harian muncul | ⬜ |
-| PT-08 | Pengguna biasa membuka panel admin | Ditolak: "belum terdaftar sebagai admin" | ⬜ |
+| PT-01 | Berjalan kaki beberapa meter | Titik biru bergerak dan angka akurasi berubah | ✅ |
+| PT-02 | Laporan kedua di titik yang sama | Kartu "Ada laporan lain di dekat sini" muncul | ✅ |
+| PT-03 | Admin mengubah status | Riwayat warga berubah tanpa tarik layar; notifikasi dan penanda muncul | ✅ |
+| PT-04 | Admin menolak tanpa alasan | Panel menolak; dengan alasan, warga melihat alasan di Detail | ✅ |
+| PT-05 | Warga menghapus saat status diproses | Tombol hapus tidak tersedia | ✅ |
+| PT-06 | Admin menghapus laporan | Laporan hilang dan entri muncul di Log penghapusan | ✅ |
+| PT-07 | Kirim 11 laporan dalam sehari | Pesan batas harian muncul | ✅ |
+| PT-08 | Pengguna biasa membuka panel admin | Ditolak: "belum terdaftar sebagai admin" | ✅ |
 
 ### Indikator keberhasilan
 
