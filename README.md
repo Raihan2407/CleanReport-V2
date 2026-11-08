@@ -167,19 +167,16 @@ Antarmuka dirancang di Figma dan diimplementasikan dengan warna, tipografi (Atki
 
 *Gambar di atas adalah rancangan Figma. Implementasi mengikuti rancangan tersebut dengan beberapa penyesuaian fungsional (lihat [bagian 15](#15-kesesuaian-dengan-proposal)).*
 
-<!--
-TANGKAPAN LAYAR APLIKASI (tambahkan setelah mengambil dari HP, simpan di docs/screenshots/):
+## Tangkapan Layar Aplikasi
 
 <table>
   <tr>
-    <td><img src="docs/screenshots/lapor.png" width="200"></td>
-    <td><img src="docs/screenshots/peta.png" width="200"></td>
-    <td><img src="docs/screenshots/riwayat.png" width="200"></td>
-    <td><img src="docs/screenshots/detail.png" width="200"></td>
+    <td align="center"><img src="docs/screenshots/lapor.png" width="200" alt="Halaman Lapor"></td>
+    <td align="center"><img src="docs/screenshots/peta.png" width="200" alt="Halaman Peta"></td>
+    <td align="center"><img src="docs/screenshots/riwayat.png" width="200" alt="Halaman Riwayat"></td>
+    <td align="center"><img src="docs/screenshots/detail.png" width="200" alt="Halaman Detail"></td>
   </tr>
 </table>
--->
-
 ---
 
 ## 5. Alur dan Arsitektur Sistem
