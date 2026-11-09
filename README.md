@@ -167,7 +167,6 @@ Antarmuka dirancang di Figma dan diimplementasikan dengan warna, tipografi (Atki
 
 *Gambar di atas adalah rancangan Figma. Implementasi mengikuti rancangan tersebut dengan beberapa penyesuaian fungsional (lihat [bagian 15](#15-kesesuaian-dengan-proposal)).*
 
-<!--
 TANGKAPAN LAYAR APLIKASI (tambahkan setelah mengambil dari HP, simpan di docs/screenshots/):
 
 <table>
@@ -178,7 +177,6 @@ TANGKAPAN LAYAR APLIKASI (tambahkan setelah mengambil dari HP, simpan di docs/sc
     <td><img src="docs/screenshots/detail.png" width="200"></td>
   </tr>
 </table>
--->
 
 ---
 
