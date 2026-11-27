@@ -188,7 +188,7 @@ Antarmuka dirancang di Figma dan diimplementasikan dengan warna, tipografi (Atki
   </tr>
   <tr>
     <td><img src="docs/screenshots/lapor.png" alt="Halaman Lapor" width="200"></td>
-    <td><img src="docs/screenshots/formulir.png" alt="Formulir Laporan" width="200"></td>
+    <td><img src="docs/screenshots/detail.png" alt="Formulir Laporan" width="200"></td>
     <td><img src="docs/screenshots/riwayat.png" alt="Halaman Riwayat" width="200"></td>
     <td><img src="docs/screenshots/detail.png" alt="Detail Laporan" width="200"></td>
   </tr>
