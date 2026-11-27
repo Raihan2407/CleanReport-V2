@@ -10,10 +10,52 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    // Admin = akun yang punya dokumen admins/{uid} (dibuat manual dari konsol).
-    function isAdmin() {
+    // Staf = akun yang punya dokumen admins/{uid} (dibuat manual dari konsol).
+    // Peran dibaca dari field "role": admin | petugas | pemerintah.
+    // Dokumen tanpa field role dianggap admin (kompatibel dengan data lama).
+    function hasStaffDoc() {
       return signedIn() &&
         exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+    function staffRole() {
+      return get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.get('role', 'admin');
+    }
+    function isAdmin() {
+      return hasStaffDoc() && staffRole() == 'admin';
+    }
+    function isPetugas() {
+      return hasStaffDoc() && staffRole() == 'petugas';
+    }
+    // Admin dan petugas boleh membaca semua laporan. Pemerintah TIDAK (hanya statistik
+    // dari public_points yang tanpa foto dan nama).
+    function isStaff() {
+      return hasStaffDoc() && staffRole() in ['admin', 'petugas'];
+    }
+
+    // Petugas hanya boleh mengubah status (received/inProgress/done), waktu ubah, dan foto sesudah;
+    // tidak boleh memulihkan laporan yang sudah ditolak.
+    function petugasUbahLaporan() {
+      return isPetugas()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt', 'fotoSesudahB64'])
+        && request.resource.data.status in ['received', 'inProgress', 'done']
+        && resource.data.status in ['received', 'inProgress', 'done']
+        && request.resource.data.get('fotoSesudahB64', '').size() <= 520000;
+    }
+
+    // Petugas hanya boleh menulis riwayat "inProgress" dan "done".
+    function petugasRiwayat(historyId) {
+      return isPetugas()
+        && historyId in ['inProgress', 'done']
+        && request.resource.data.keys().hasOnly(['status', 'changedAt', 'catatan'])
+        && request.resource.data.status == historyId
+        && request.resource.data.catatan is string && request.resource.data.catatan.size() <= 300;
+    }
+
+    // Petugas hanya boleh mengubah status dan data wilayah pada titik publik.
+    function petugasUbahTitik() {
+      return isPetugas()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'kelurahan', 'kecamatan', 'kota'])
+        && request.resource.data.status in ['received', 'inProgress', 'done'];
     }
 
     function kategoriValid(k) {
@@ -84,25 +126,25 @@ service cloud.firestore {
       allow write: if false;
     }
 
-    // Laporan: pelapor (anonim) hanya melihat laporannya sendiri; admin melihat semua.
+    // Laporan: pelapor (anonim) hanya melihat laporannya sendiri; admin dan petugas melihat semua.
     match /reports/{reportId} {
-      allow read: if signedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow read: if signedIn() && (resource.data.userId == request.auth.uid || isStaff());
       allow create: if signedIn() && laporanValid(request.resource.data);
-      allow update: if isAdmin();
+      allow update: if isAdmin() || petugasUbahLaporan();
       allow delete: if signedIn() && (isAdmin() ||
         (resource.data.userId == request.auth.uid && resource.data.status in ['received', 'rejected']));
 
       match /statusHistory/{historyId} {
-        allow read: if signedIn() && (isAdmin() ||
+        allow read: if signedIn() && (isStaff() ||
           get(/databases/$(database)/documents/reports/$(reportId)).data.userId == request.auth.uid);
         // Pelapor hanya boleh membuat catatan awal "received" (di batch yang sama dengan laporan).
-        allow create: if signedIn() && (isAdmin() ||
+        allow create: if signedIn() && (isAdmin() || petugasRiwayat(historyId) ||
           (historyId == 'received'
             && request.resource.data.keys().hasOnly(['status', 'changedAt', 'catatan'])
             && request.resource.data.status == 'received'
             && request.resource.data.catatan == ''
             && getAfter(/databases/$(database)/documents/reports/$(reportId)).data.userId == request.auth.uid));
-        allow update: if isAdmin();
+        allow update: if isAdmin() || petugasRiwayat(historyId);
         allow delete: if signedIn() && (isAdmin() || ownerCanDelete(reportId));
       }
     }
@@ -110,8 +152,9 @@ service cloud.firestore {
     // Titik publik (tanpa foto & nama) untuk peringatan laporan ganda.
     match /public_points/{pointId} {
       allow read: if signedIn();
-      allow create: if signedIn() && (isAdmin() || titikValid(request.resource.data));
-      allow update: if isAdmin();
+      allow create: if signedIn() && (isAdmin() || titikValid(request.resource.data) ||
+        (isPetugas() && request.resource.data.keys().hasOnly(['status', 'kelurahan', 'kecamatan', 'kota'])));
+      allow update: if isAdmin() || petugasUbahTitik();
       allow delete: if signedIn() && (isAdmin() ||
         (resource.data.userId == request.auth.uid && resource.data.status in ['received', 'rejected']));
     }

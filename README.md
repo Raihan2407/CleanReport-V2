@@ -115,18 +115,28 @@ Kendala yang umum dialami pelapor adalah menyampaikan bukti kejadian, menjelaska
 | **Bantuan** | Lembar cara melapor dan tombol telepon dari header. |
 | **Mode lokal** | Bila Firebase belum dikonfigurasi, aplikasi tetap berjalan dengan data tersimpan di HP (cocok untuk demo). |
 
-### Panel admin (web, satu berkas)
+### Panel web (satu berkas, tiga peran)
+
+Satu halaman web melayani tiga peran. Peran ditentukan oleh dokumen `admins/{uid}` pada field `role`, dan **dipaksakan oleh aturan Firestore**, bukan hanya oleh tampilan.
+
+| Peran | Untuk siapa | Yang dilihat | Yang boleh dilakukan |
+|---|---|---|---|
+| **Admin** | Pengelola sistem | Daftar, peta, dan statistik | Semua: ubah status, tolak dengan alasan, hapus, lihat log, lengkapi data wilayah |
+| **Petugas** | Petugas lapangan | **Peta semua lokasi laporan yang masih terbuka** dan daftar laporan | Ubah status (diproses/selesai), tulis catatan, unggah foto sesudah. Tidak bisa menolak, menghapus, atau memulihkan laporan yang ditolak |
+| **Pemerintah setempat** | Pihak pemantau wilayah | **Dashboard statistik saja**: jumlah laporan dan jumlah pelapor unik per wilayah | Hanya membaca. **Tidak dapat melihat foto maupun nama pelapor** |
 
 | Fitur | Keterangan |
 |---|---|
-| Login admin | Email dan kata sandi (Firebase Authentication); hanya akun yang terdaftar di koleksi `admins` yang boleh masuk. |
+| Login | Email dan kata sandi (Firebase Authentication); hanya akun yang terdaftar di koleksi `admins` yang boleh masuk. |
 | Daftar realtime | Laporan baru muncul otomatis dengan bunyi bip dan pemberitahuan; filter status, pencarian, dan hitungan baru/diproses/selesai/ditolak. |
+| **Peta lokasi** | Semua laporan terbuka tampil sebagai penanda berwarna (baru, diproses, selesai, ditolak); ketuk penanda untuk membuka detail. |
+| **Statistik** | Total laporan valid, pelapor unik, laporan terbuka dan selesai, tingkat penyelesaian, per status, per jenis sampah, tren harian, dan tabel per kota/kecamatan/kelurahan dengan filter wilayah dan rentang waktu. |
 | Detail dan peta | Foto laporan, foto sesudah, koordinat, tautan Google Maps, dan peta Leaflet/OpenStreetMap. |
 | Tindak lanjut | Ubah status, tulis catatan untuk pelapor, unggah foto sesudah (dikecilkan otomatis). |
-| **Tolak** | Status "Ditolak" dengan alasan wajib; bersifat **dapat dibatalkan** (ubah status kembali untuk memulihkan). |
-| **Hapus permanen** | Pilihan terakhir dengan konfirmasi dan alasan wajib. |
-| **Log penghapusan** | Mencatat siapa menghapus apa dan kapan (id, kode, status, waktu; **tanpa isi laporan**). |
-| Ekspor | Unduh daftar laporan dalam format CSV. |
+| **Tolak** | Status "Ditolak" dengan alasan wajib; bersifat **dapat dibatalkan** (ubah status kembali untuk memulihkan). Hanya admin. |
+| **Hapus permanen** | Pilihan terakhir dengan konfirmasi dan alasan wajib. Hanya admin. |
+| **Log penghapusan** | Mencatat siapa menghapus apa dan kapan (id, kode, status, waktu; **tanpa isi laporan**). Hanya admin. |
+| **Ekspor rapi** | **Excel (.xlsx)** dengan lembar Laporan (kolom lebar sesuai isi dan penyaring) dan Ringkasan; **CSV** bertitik koma dengan desimal koma agar terbuka rapi di Excel berbahasa Indonesia; tanggal dan jam terpisah, kolom kelurahan/kecamatan/kota, dan tautan peta. Dashboard statistik punya unduhan Excel sendiri. |
 
 ### Status laporan
 
@@ -167,14 +177,20 @@ Antarmuka dirancang di Figma dan diimplementasikan dengan warna, tipografi (Atki
 
 *Gambar di atas adalah rancangan Figma. Implementasi mengikuti rancangan tersebut dengan beberapa penyesuaian fungsional (lihat [bagian 15](#15-kesesuaian-dengan-proposal)).*
 
-TANGKAPAN LAYAR APLIKASI
+### Tangkapan layar aplikasi
 
 <table>
   <tr>
-    <td><img src="docs/screenshots/lapor.png" width="200"></td>
-    <td><img src="docs/screenshots/peta.png" width="200"></td>
-    <td><img src="docs/screenshots/riwayat.png" width="200"></td>
-    <td><img src="docs/screenshots/detail.png" width="200"></td>
+    <th align="center">Lapor</th>
+    <th align="center">Formulir</th>
+    <th align="center">Riwayat</th>
+    <th align="center">Detail</th>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/lapor.png" alt="Halaman Lapor" width="200"></td>
+    <td><img src="docs/screenshots/formulir.png" alt="Formulir Laporan" width="200"></td>
+    <td><img src="docs/screenshots/riwayat.png" alt="Halaman Riwayat" width="200"></td>
+    <td><img src="docs/screenshots/detail.png" alt="Detail Laporan" width="200"></td>
   </tr>
 </table>
 
@@ -331,9 +347,9 @@ erDiagram
 |---|---|
 | `reports/{id}` | `userId`, `kategori`, `patokanLokasi`, `namaPelapor`, `anonim`, `latitude`, `longitude`, `alamatTeks`, `alamatDetail`, `fotoSebelumB64`, `fotoSesudahB64` (diisi admin), `status` (`received`, `inProgress`, `done`, `rejected`), `createdAt`, `updatedAt` |
 | `reports/{id}/statusHistory/{status}` | `status`, `changedAt`, `catatan` (alasan atau catatan petugas) |
-| `public_points/{id}` | `userId`, `lat`, `lng`, `kategori`, `status`, `createdAt` (tanpa foto dan nama; untuk peringatan laporan ganda) |
+| `public_points/{id}` | `userId`, `lat`, `lng`, `kategori`, `status`, `createdAt` (tanpa foto dan nama; untuk peringatan laporan ganda dan statistik pemerintah). Panel menambahkan `kelurahan`, `kecamatan`, `kota` hasil penguraian alamat. |
 | `audit_log/{auto}` | `laporanId`, `kode`, `aksi`, `peran` (`admin`/`pelapor`), `uid`, `email`, `status`, `waktu`, `alasan` (tanpa isi laporan) |
-| `admins/{uid}` | `name` (dibuat manual dari konsol Firebase) |
+| `admins/{uid}` | `role` (`admin`, `petugas`, atau `pemerintah`; tanpa field ini dianggap `admin`), `name` (bebas), `wilayah` (opsional, hanya untuk pemerintah: nama kota/kecamatan sebagai filter awal). Dibuat manual dari konsol Firebase. |
 
 > **Foto** disimpan sebagai teks base64 di dokumen laporan (tanpa Cloud Storage agar tetap gratis). Satu dokumen Firestore maksimal 1 MiB dan memuat foto warga serta foto sesudah, sehingga **tiap foto dibatasi 350 KB**; aplikasi dan panel mengecilkannya otomatis.
 
@@ -344,12 +360,12 @@ erDiagram
 | Aspek | Penerapan |
 |---|---|
 | **Identitas** | Warga memakai login anonim Firebase, tanpa daftar. Nama bersifat opsional dan hanya disimpan bila pelapor mematikan mode anonim. **Nomor kontak tidak disimpan.** |
-| **Hak akses** | Aturan Firestore: warga hanya membaca laporannya sendiri; admin (akun terdaftar di `admins`) membaca dan mengubah semua. |
+| **Hak akses** | Aturan Firestore: warga hanya membaca laporannya sendiri. Staf dibedakan menurut `role` di `admins`: **admin** membaca dan mengubah semua; **petugas** membaca semua laporan tetapi hanya boleh mengubah status, catatan, dan foto sesudah; **pemerintah** **tidak dapat membaca laporan** sama sekali, hanya titik publik tanpa foto dan nama. |
 | **Validasi di server** | Aturan menolak field tak dikenal, tipe salah, teks terlalu panjang, koordinat di luar rentang, jenis sampah di luar empat kategori, dan status awal selain `received`. |
 | **Hapus** | Warga hanya dapat menghapus saat status `received` atau `rejected`. Setiap penghapusan tercatat di `audit_log`. |
 | **Laporan ganda** | Hanya titik, jenis, dan status yang dibagikan ke pengguna lain, tanpa foto dan nama. |
 | **Anti-spam** | Batas 10 laporan per 24 jam (di sisi aplikasi). |
-| **Panel admin** | Semua teks dari warga disaring sebelum ditampilkan (mencegah XSS); akses admin dicek lewat dokumen `admins/{uid}`. |
+| **Panel admin** | Semua teks dari warga disaring sebelum ditampilkan (mencegah XSS); akses dicek lewat dokumen `admins/{uid}`; ekspor CSV menetralkan sel yang diawali rumus agar tidak dieksekusi Excel. |
 | **Pelindungan data pribadi** | Data diminimalkan sejalan dengan prinsip UU No. 27 Tahun 2022 tentang Pelindungan Data Pribadi. Lokasi dan foto dapat memuat informasi terkait individu sehingga akses dibatasi pada pemilik laporan dan admin. |
 
 > Dokumen ini tidak menyatakan sistem telah memenuhi standar keamanan tertentu. Batasan yang diketahui dicantumkan di [bagian 17](#17-batasan-dan-rencana-pengembangan).
@@ -372,8 +388,8 @@ flutter doctor        # semua bagian Android toolchain harus bercentang
 ### Menjalankan
 
 ```bash
-git clone https://github.com/Kristian1405/Project-PPB.git
-cd Project-PPB
+git clone https://github.com/Raihan2407/CleanReport-V2.git
+cd CleanReport-V2
 flutter pub get
 flutter run           # HP tersambung USB, atau pilih perangkat dengan -d
 ```
@@ -397,7 +413,15 @@ Semua langkah memakai paket **Spark** (tanpa kartu pembayaran). **Jangan** menga
 2. **Authentication → Sign-in method:** aktifkan **Anonymous** dan **Email/Password**.
 3. **Firestore Database → Create database** (production mode, lokasi `asia-southeast2` atau `asia-southeast1`).
 4. Tab **Rules:** hapus isi lama, tempel seluruh isi [`firestore.rules`](firestore.rules), lalu **Publish**.
-5. **Akun admin:** Authentication → Users → **Add user** (email dan sandi), salin **User UID**. Di Firestore buat koleksi **`admins`**, *Document ID* = UID tadi, dengan satu field `name` (string).
+5. **Akun staf (admin, petugas, pemerintah):** untuk setiap orang, Authentication → Users → **Add user** (email dan sandi), lalu salin **User UID** lewat ikon salin (jangan diketik). Di Firestore koleksi **`admins`** buat dokumen dengan *Document ID* = UID tadi dan field berikut:
+
+   | Field | Nilai | Keterangan |
+   |---|---|---|
+   | `role` | `admin`, `petugas`, atau `pemerintah` (string) | Menentukan hak akses |
+   | `name` | teks bebas | Tampil di panel |
+   | `wilayah` | mis. `Tanjungpinang Timur` (string) | **Opsional**, hanya untuk pemerintah: filter awal dashboard |
+
+   Dokumen lama tanpa field `role` tetap dianggap admin.
 6. **Hubungkan aplikasi Android** (sekali saja):
    ```bash
    dart pub global activate flutterfire_cli
@@ -433,11 +457,24 @@ Setelah ditayangkan, tambahkan domain hosting di *Authentication → Settings �
 
 **Memakai panel**
 
-1. Masuk dengan akun admin.
-2. Pilih laporan di daftar kiri; detail dan peta tampil di kanan.
-3. Ubah status, tulis catatan atau alasan, unggah foto sesudah, lalu **Simpan perubahan**.
-4. Untuk spam atau laporan tidak valid, pilih status **Ditolak** dan tulis alasan (dapat dibatalkan). **Hapus laporan** hanya sebagai pilihan terakhir.
-5. **Log penghapusan** menampilkan 50 penghapusan terakhir.
+*Admin*
+1. Masuk, lalu pilih laporan di tab **Daftar**; detail dan peta tampil di kanan.
+2. Ubah status, tulis catatan atau alasan, unggah foto sesudah, lalu **Simpan perubahan**.
+3. Untuk spam atau laporan tidak valid, pilih status **Ditolak** dan tulis alasan (dapat dibatalkan). **Hapus laporan** hanya sebagai pilihan terakhir; **Log penghapusan** menampilkan 50 penghapusan terakhir.
+4. Tab **Statistik:** tekan **Lengkapi data wilayah** sesekali agar laporan lama ikut terhitung per wilayah (laporan baru dilengkapi otomatis selagi panel terbuka).
+
+*Petugas*
+1. Masuk; tab **Peta** langsung menampilkan semua lokasi laporan yang masih terbuka (oranye = baru, biru = diproses). Centang kotak untuk menampilkan juga yang selesai dan ditolak.
+2. Ketuk penanda untuk membuka detail, lalu ubah status ke "Petugas meluncur" atau "Sudah bersih", tulis catatan, dan unggah foto sesudah.
+
+*Pemerintah setempat*
+1. Masuk; dashboard **Statistik** terbuka otomatis, dengan filter wilayah terisi dari field `wilayah` di akun (bila ada).
+2. Ubah rentang waktu, tingkat pengelompokan (kota, kecamatan, kelurahan), atau ketik nama wilayah. Unduh ringkasannya dengan **Unduh Excel (ringkasan)**.
+
+*Ekspor (admin dan petugas)*
+**Unduh Excel** menghasilkan berkas `.xlsx` berisi lembar Laporan dan Ringkasan. **Unduh CSV** memakai pemisah titik koma; keduanya mengikuti filter dan pencarian yang sedang aktif di tab Daftar.
+
+> Statistik pemerintah dihitung dari titik publik tanpa foto dan nama. "Pelapor unik" dihitung per akun anonim (satu akun = satu perangkat), jadi satu orang dengan dua HP terhitung dua. Wilayah diurai dari teks alamat hasil geocoding sehingga berupa perkiraan.
 
 ---
 
@@ -540,7 +577,7 @@ Urutan ini penting karena aplikasi dan panel bergantung pada aturan Firestore.
 |---|---|---|
 | Google Maps (`google_maps_flutter`) | OpenStreetMap (`flutter_map`) | Tanpa kunci API dan tanpa akun penagihan |
 | Cloud Storage untuk foto | Foto base64 di Firestore (maks. 350 KB) | Cloud Storage kini memerlukan paket berbayar |
-| Petugas tidak dimodelkan (pengembangan lanjutan) | Panel admin web sederhana | Menutup alur lapor → ditangani → warga tahu |
+| Petugas tidak dimodelkan (pengembangan lanjutan) | Panel web dengan tiga peran: admin, petugas, pemerintah setempat | Menutup alur lapor → ditangani → warga tahu, dan sesuai masukan dosen |
 | Nomor WhatsApp pada formulir | Dihapus | KNF04: nomor kontak tidak disimpan |
 | Jenis sampah "bisa dipilih" (desain) | Pilih satu | Sesuai PU-06 dan kamus data `kategori` |
 | Kontrol lampu dan flip kamera (desain) | Dihapus | Kamera sistem sudah menyediakannya |
@@ -550,7 +587,7 @@ Urutan ini penting karena aplikasi dan panel bergantung pada aturan Firestore.
 
 ### Fitur tambahan di luar proposal
 
-GPS realtime, peringatan laporan ganda, kirim offline, notifikasi status, foto sebelum/sesudah, catatan petugas, status "Ditolak", hapus laporan, log penghapusan, batas harian, panel admin, dan ekspor CSV.
+GPS realtime, peringatan laporan ganda, kirim offline, notifikasi status, foto sebelum/sesudah, catatan petugas, status "Ditolak", hapus laporan, log penghapusan, batas harian, panel web dengan tiga peran (admin, petugas, pemerintah setempat), peta lokasi untuk petugas, dashboard statistik per wilayah, serta ekspor Excel dan CSV yang rapi. Peran petugas, peran pemerintah, dan perbaikan format ekspor mengikuti masukan dosen pada demo fase 3.
 
 ---
 
@@ -558,7 +595,7 @@ GPS realtime, peringatan laporan ganda, kirim offline, notifikasi status, foto s
 
 ### Skenario uji fungsi utama (black-box)
 
-Kolom **Hasil** diisi tim setelah menjalankan pengujian pada perangkat uji.
+Kolom **Hasil** diisi tim setelah menjalankan pengujian pada perangkat uji. **✅ = lulus, ⬜ = belum diuji.**
 
 | ID | Fitur | Skenario | Langkah | Hasil diharapkan | Hasil |
 |---|---|---|---|---|---|
@@ -588,7 +625,13 @@ Kolom **Hasil** diisi tim setelah menjalankan pengujian pada perangkat uji.
 | PT-05 | Warga menghapus saat status diproses | Tombol hapus tidak tersedia | ✅ |
 | PT-06 | Admin menghapus laporan | Laporan hilang dan entri muncul di Log penghapusan | ✅ |
 | PT-07 | Kirim 11 laporan dalam sehari | Pesan batas harian muncul | ✅ |
-| PT-08 | Pengguna biasa membuka panel admin | Ditolak: "belum terdaftar sebagai admin" | ✅ |
+| PT-08 | Pengguna biasa membuka panel | Ditolak: "belum terdaftar sebagai staf" | ✅ |
+| PT-09 | Petugas membuka panel | Tab Peta tampil dengan penanda laporan terbuka; tidak ada pilihan "Ditolak" dan tombol Hapus | ⬜ |
+| PT-10 | Petugas mengubah status ke "Petugas meluncur" | Tersimpan; status di HP warga berubah | ⬜ |
+| PT-11 | Pemerintah membuka panel | Hanya dashboard Statistik; tidak ada foto atau nama pelapor | ⬜ |
+| PT-12 | Pemerintah mengisi filter wilayah | Angka laporan dan pelapor unik menyesuaikan wilayah | ⬜ |
+| PT-13 | Unduh Excel dan CSV dari panel | Terbuka rapi di Excel: kolom terbaca, tanggal dan jam terpisah, tautan peta berfungsi | ⬜ |
+| PT-14 | Akun pemerintah mencoba membaca laporan lewat konsol browser | Ditolak aturan Firestore (permission-denied) | ⬜ |
 
 ### Indikator keberhasilan
 
@@ -613,13 +656,17 @@ Kolom **Hasil** diisi tim setelah menjalankan pengujian pada perangkat uji.
 - **Anti-spam** berada di sisi aplikasi; belum ada Firebase App Check.
 - **Waktu laporan** memakai jam perangkat pelapor.
 - **Peta** membutuhkan internet untuk mengunduh tile. Server tile OpenStreetMap gratis untuk pemakaian ringan; untuk skala besar gunakan penyedia tile sendiri (`AppConfig.tileUrl`).
-- **Panel admin** membaca maksimal 300 laporan terbaru dan belum menyediakan penugasan regu, statistik, dan kelola admin dari antarmuka.
+- **Panel** membaca maksimal 300 laporan terbaru (admin dan petugas) dan 1.000 titik (statistik). Belum ada penugasan laporan ke petugas tertentu dan kelola akun staf dari antarmuka; akun dan perannya dibuat manual di konsol Firebase.
+- **Data wilayah** diurai dari teks alamat hasil geocoding, sehingga berupa perkiraan dan bisa masuk "Tidak diketahui" bila alamat tidak terbaca. Laporan lama perlu tombol "Lengkapi data wilayah".
+- **Pelapor unik** dihitung per akun anonim (satu akun = satu perangkat; pasang ulang aplikasi menghasilkan akun baru).
+- **Filter wilayah pemerintah** hanya pembatas tampilan; data titik publik tetap dapat dibaca semua pengguna yang masuk (tidak memuat foto maupun nama).
 - **Nomor telepon bantuan** (`AppConfig.helpNumber`, saat ini `311`) hanya contoh dari mockup dan bukan kerja sama resmi dengan instansi mana pun.
 - Hanya **Android** yang disiapkan.
 
 ### Rencana pengembangan
 
-- Menetapkan pihak yang menindaklanjuti laporan dan mekanisme pembaruan status oleh petugas.
+- Menetapkan pihak yang menindaklanjuti laporan; penugasan laporan ke petugas tertentu.
+- Menyimpan wilayah (kota, kecamatan) langsung di aplikasi agar statistik tidak bergantung penguraian teks.
 - Halaman *Tentang* berisi kebijakan privasi, lisensi, dan cara meminta penghapusan data.
 - Login opsional (email atau Google) agar riwayat tidak hilang saat berganti perangkat.
 - Firebase App Check dan penggunaan jam server untuk waktu laporan.

@@ -389,6 +389,228 @@
     .toast.bad {
       background: var(--red);
     }
+
+    .chip.role {
+      background: #E8F5EC;
+      color: var(--green-d);
+    }
+
+    .navbtn.on {
+      background: var(--green);
+      color: #fff;
+    }
+
+    .inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin: 0;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--slate);
+    }
+
+    .inline input {
+      width: auto;
+    }
+
+    .mapview,
+    .statsview {
+      padding: 16px 20px;
+    }
+
+    .maptools {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .legend {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--slate);
+    }
+
+    .legend i {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+      border: 2px solid #fff;
+      box-shadow: 0 0 0 1px #ccc;
+    }
+
+    #bigMap {
+      height: calc(100vh - 190px);
+      min-height: 420px;
+      border-radius: 14px;
+      box-shadow: 0 1px 6px rgba(20, 20, 60, .12);
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: end;
+      margin-bottom: 14px;
+    }
+
+    .toolbar>div {
+      min-width: 150px;
+    }
+
+    .toolbar label {
+      margin-top: 0;
+    }
+
+    .statgrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .stat {
+      background: #fff;
+      border-radius: 14px;
+      padding: 14px 16px;
+      box-shadow: 0 1px 6px rgba(20, 20, 60, .08);
+    }
+
+    .stat .v {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--green-d);
+      line-height: 1.1;
+    }
+
+    .stat .l {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .grid2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    @media (max-width: 900px) {
+      .grid2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card h3 {
+      margin: 0 0 12px;
+      font-size: 16px;
+    }
+
+    .bar {
+      display: grid;
+      grid-template-columns: 140px 1fr 40px;
+      gap: 10px;
+      align-items: center;
+      margin: 7px 0;
+      font-size: 13.5px;
+    }
+
+    .bar .bt {
+      background: #EEF0F6;
+      border-radius: 999px;
+      height: 12px;
+      overflow: hidden;
+      display: block;
+    }
+
+    .bar .bt i {
+      display: block;
+      height: 100%;
+      border-radius: 999px;
+    }
+
+    .bar b {
+      text-align: right;
+    }
+
+    .trend {
+      display: flex;
+      gap: 4px;
+      align-items: flex-end;
+      height: 150px;
+      padding-top: 6px;
+    }
+
+    .trend .tcol {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      height: 100%;
+      min-width: 0;
+    }
+
+    .trend .tcol i {
+      display: block;
+      width: 100%;
+      background: var(--green);
+      border-radius: 4px 4px 0 0;
+      min-height: 2px;
+    }
+
+    .trend .tcol span {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 4px;
+      white-space: nowrap;
+    }
+
+    .trend .tcol em {
+      font-style: normal;
+      font-size: 11px;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    table.tbl {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    table.tbl th,
+    table.tbl td {
+      text-align: left;
+      padding: 9px 10px;
+      border-top: 1px solid var(--line);
+    }
+
+    table.tbl th {
+      color: var(--muted);
+      font-weight: 600;
+      border-top: 0;
+    }
+
+    table.tbl td.n,
+    table.tbl th.n {
+      text-align: right;
+    }
+
+    .note {
+      background: #FFF4D6;
+      color: #6b4500;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 13.5px;
+      margin-bottom: 14px;
+    }
   </style>
 </head>
 
@@ -399,7 +621,7 @@
       <h1>CleanReport Admin</h1>
       <div style="color:var(--slate);font-size:14px">Masuk untuk melihat dan menindaklanjuti laporan warga.</div>
       <div id="cfgwarn" class="warn" hidden>Isi dulu <b>firebaseConfig</b> di bagian atas &lt;script&gt; pada file ini
-        (lihat PANDUAN-V2.md).</div>
+        (lihat README.md bagian 11).</div>
       <label for="email">Email admin</label>
       <input id="email" type="email" autocomplete="username">
       <label for="pass">Kata sandi</label>
@@ -411,17 +633,23 @@
 
   <div id="app" hidden>
     <header class="top">
-      <h1>CleanReport Admin</h1>
-      <span class="chip new" id="cNew">0 baru</span>
-      <span class="chip" id="cProc">0 diproses</span>
-      <span class="chip" id="cDone">0 selesai</span>
-      <span class="chip" id="cRej">0 ditolak</span>
-      <button class="btn alt" id="soundBtn">🔔 Suara: nyala</button>
-      <button class="btn alt" id="csvBtn">Unduh CSV</button>
-      <button class="btn alt" id="logBtn">Log penghapusan</button>
+      <h1>CleanReport</h1>
+      <span class="chip role" id="roleChip"></span>
+      <span class="chip new" id="cNew" data-roles="admin,petugas">0 baru</span>
+      <span class="chip" id="cProc" data-roles="admin,petugas">0 diproses</span>
+      <span class="chip" id="cDone" data-roles="admin,petugas">0 selesai</span>
+      <span class="chip" id="cRej" data-roles="admin,petugas">0 ditolak</span>
+      <button class="btn alt navbtn" data-view="list" data-roles="admin,petugas">Daftar</button>
+      <button class="btn alt navbtn" data-view="map" data-roles="admin,petugas">Peta</button>
+      <button class="btn alt navbtn" data-view="stats" data-roles="admin,pemerintah">Statistik</button>
+      <button class="btn alt" id="soundBtn" data-roles="admin,petugas">🔔 Suara: nyala</button>
+      <button class="btn alt" id="csvBtn" data-roles="admin,petugas">Unduh CSV</button>
+      <button class="btn alt" id="xlsBtn" data-roles="admin,petugas">Unduh Excel</button>
+      <button class="btn alt" id="logBtn" data-roles="admin">Log penghapusan</button>
       <button class="btn alt" id="outBtn">Keluar</button>
     </header>
-    <div class="layout">
+
+    <div id="viewList" class="layout">
       <aside>
         <div class="filters" id="filters">
           <button data-f="all" class="on">Semua</button>
@@ -437,6 +665,69 @@
         <div class="empty">Pilih laporan di sebelah kiri untuk melihat detail.</div>
       </section>
     </div>
+
+    <section id="viewMap" class="mapview" hidden>
+      <div class="maptools">
+        <span class="chip new" id="mapCount">0 lokasi terbuka</span>
+        <span class="legend"><i style="background:#F59E0B"></i> Baru</span>
+        <span class="legend"><i style="background:#2563EB"></i> Diproses</span>
+        <span class="legend"><i style="background:#00652C"></i> Selesai</span>
+        <span class="legend"><i style="background:#9CA3AF"></i> Ditolak</span>
+        <label class="inline"><input type="checkbox" id="mapAll"> Tampilkan juga yang selesai dan ditolak</label>
+        <span style="font-size:13px;color:var(--muted)">Ketuk penanda untuk membuka detail laporan.</span>
+      </div>
+      <div id="bigMap"></div>
+    </section>
+
+    <section id="viewStats" class="statsview" hidden>
+      <div class="toolbar">
+        <div><label for="rangeSel">Rentang waktu</label>
+          <select id="rangeSel">
+            <option value="7">7 hari terakhir</option>
+            <option value="30" selected>30 hari terakhir</option>
+            <option value="90">90 hari terakhir</option>
+            <option value="0">Semua waktu</option>
+          </select>
+        </div>
+        <div><label for="lvlSel">Kelompokkan per</label>
+          <select id="lvlSel">
+            <option value="kota">Kota / kabupaten</option>
+            <option value="kecamatan" selected>Kecamatan</option>
+            <option value="kelurahan">Kelurahan</option>
+          </select>
+        </div>
+        <div style="flex:1;min-width:200px"><label for="wilQ">Filter wilayah (nama kota, kecamatan, atau
+            kelurahan)</label>
+          <input id="wilQ" placeholder="Kosongkan untuk semua wilayah">
+        </div>
+        <button class="btn" id="statXlsBtn">Unduh Excel (ringkasan)</button>
+        <button class="btn alt" id="syncBtn" data-roles="admin">Lengkapi data wilayah</button>
+      </div>
+      <div id="statNote"></div>
+      <div class="statgrid" id="statCards"></div>
+      <div class="grid2">
+        <div class="card">
+          <h3>Laporan per status</h3>
+          <div id="barStatus"></div>
+        </div>
+        <div class="card">
+          <h3>Laporan per jenis sampah</h3>
+          <div id="barKat"></div>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:14px">
+        <h3 id="trendTitle">Laporan per hari</h3>
+        <div class="trend" id="trendBox"></div>
+      </div>
+      <div class="card">
+        <h3 id="wilTitle">Laporan per wilayah</h3>
+        <div style="overflow:auto">
+          <table class="tbl" id="wilTable"></table>
+        </div>
+        <div style="font-size:12.5px;color:var(--muted);margin-top:10px">Pelapor unik dihitung per akun anonim (satu
+          akun = satu perangkat). Data tidak memuat foto maupun nama pelapor.</div>
+      </div>
+    </section>
   </div>
 
   <div id="logBox" class="overlay" hidden>
@@ -454,14 +745,14 @@
   <div id="toast" class="toast" hidden></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getFirestore, collection, query, orderBy, limit, onSnapshot, doc, getDoc, getDocs, writeBatch, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getFirestore, collection, query, orderBy, limit, onSnapshot, doc, getDoc, getDocs, setDoc, writeBatch, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     // ====== ISI DENGAN KONFIGURASI WEB APP FIREBASE ANDA ======
     // Firebase Console -> Project settings -> Your apps -> Web app -> SDK setup and configuration
-    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
     const firebaseConfig = {
       apiKey: "AIzaSyAz0wJwkgc_24VTHfXuDq8RXuOhX8edxB8",
       authDomain: "cleanreport-v2.firebaseapp.com",
@@ -475,21 +766,181 @@
 
     const $ = (id) => document.getElementById(id);
     const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+    // <PURE>  (fungsi tanpa DOM; diuji terpisah)
     const LABEL = { received: "Baru", inProgress: "Diproses", done: "Selesai", rejected: "Ditolak" };
     const NAMES = { received: "Laporan Diterima", inProgress: "Petugas Meluncur", done: "Sudah Bersih", rejected: "Laporan Ditolak" };
+    const code = (id) => "#CR-" + String(id).replace(/[^A-Za-z0-9]/g, "").toUpperCase().slice(-5);
+    const pad = (n) => String(n).padStart(2, "0");
+    const ymd = (d) => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+    const hm = (d) => pad(d.getHours()) + ":" + pad(d.getMinutes());
+    const toDate = (ts) => (ts && typeof ts.toDate === "function") ? ts.toDate() : (ts instanceof Date ? ts : null);
+    const num = (v) => { const n = Number(v); return (v !== "" && v != null && Number.isFinite(n)) ? n : ""; };
+    const mapsLink = (r) => "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(r.latitude + "," + r.longitude);
+
+    // Memecah alamatDetail ("kelurahan, kecamatan, kota") menjadi bagian-bagiannya.
+    // Hasil geocoding tidak selalu lengkap, jadi ini perkiraan; yang tidak terbaca menjadi kosong.
+    function parseWilayah(detail) {
+      const raw = String(detail || "").trim();
+      const empty = { kelurahan: "", kecamatan: "", kota: "" };
+      if (!raw || /^-?\d+([.,]\d+)?\s*,\s*-?\d+([.,]\d+)?$/.test(raw)) return empty;
+      const parts = raw.split(",").map((s) => s.trim()).filter(Boolean);
+      if (parts.length >= 3) return { kelurahan: parts[0], kecamatan: parts[parts.length - 2], kota: parts[parts.length - 1] };
+      if (parts.length === 2) return { kelurahan: "", kecamatan: parts[0], kota: parts[1] };
+      if (parts.length === 1) return { kelurahan: "", kecamatan: "", kota: parts[0] };
+      return empty;
+    }
+
+    // CSV untuk Excel berbahasa Indonesia: pemisah titik koma, desimal koma, anti rumus berbahaya.
+    function toCsv(rows) {
+      return rows.map((row, ri) => row.map((v) => {
+        if (typeof v === "number") return String(v).replace(".", ",");
+        let t = String(v ?? "");
+        if (ri > 0 && /^[=+\-@\t\r]/.test(t)) t = "'" + t;
+        return '"' + t.replace(/"/g, '""') + '"';
+      }).join(";")).join("\r\n");
+    }
+
+    function reportTableRows(list) {
+      const rows = [["Kode", "Tanggal", "Jam", "Status", "Jenis sampah", "Patokan lokasi", "Alamat", "Kelurahan", "Kecamatan", "Kota/Kabupaten", "Latitude", "Longitude", "Tautan peta", "Pelapor", "Foto sesudah"]];
+      list.forEach((r) => {
+        const d = toDate(r.createdAt);
+        const w = parseWilayah(r.alamatDetail);
+        rows.push([
+          code(r.id), d ? ymd(d) : "", d ? hm(d) : "", NAMES[r.status || "received"] || r.status || "",
+          r.kategori || "", r.patokanLokasi || "", r.alamatTeks || "",
+          w.kelurahan, w.kecamatan, w.kota, num(r.latitude), num(r.longitude), mapsLink(r),
+          r.anonim === false ? (r.namaPelapor || "Anonim") : "Anonim", r.fotoSesudahB64 ? "Ya" : "Tidak"
+        ]);
+      });
+      return rows;
+    }
+
+    function summaryRowsFromReports(all) {
+      const st = { received: 0, inProgress: 0, done: 0, rejected: 0 };
+      const kat = new Map(), kota = new Map();
+      all.forEach((r) => {
+        const s = (r.status in st) ? r.status : "received"; st[s]++;
+        const k = r.kategori || "Lainnya"; kat.set(k, (kat.get(k) || 0) + 1);
+        const kt = parseWilayah(r.alamatDetail).kota || "Tidak diketahui"; kota.set(kt, (kota.get(kt) || 0) + 1);
+      });
+      const rows = [["Ringkasan laporan CleanReport"], ["Dibuat", new Date().toLocaleString("id-ID")], ["Total laporan", all.length], [], ["Per status", "Jumlah"]];
+      Object.keys(st).forEach((k) => rows.push([NAMES[k], st[k]]));
+      rows.push([], ["Per jenis sampah", "Jumlah"]);
+      [...kat.entries()].sort((a, b) => b[1] - a[1]).forEach((e) => rows.push([e[0], e[1]]));
+      rows.push([], ["Per kota/kabupaten", "Jumlah"]);
+      [...kota.entries()].sort((a, b) => b[1] - a[1]).forEach((e) => rows.push([e[0], e[1]]));
+      return rows;
+    }
+
+    function sheetFrom(X, rows, widths, withFilter) {
+      const ws = X.utils.aoa_to_sheet(rows);
+      ws["!cols"] = widths.map((w) => ({ wch: w }));
+      if (withFilter && ws["!ref"]) ws["!autofilter"] = { ref: ws["!ref"] };
+      return ws;
+    }
+
+    function buildReportsWorkbook(X, list, all) {
+      const wb = X.utils.book_new();
+      X.utils.book_append_sheet(wb, sheetFrom(X, reportTableRows(list), [12, 12, 8, 18, 18, 28, 38, 20, 20, 20, 11, 11, 50, 18, 12], true), "Laporan");
+      X.utils.book_append_sheet(wb, sheetFrom(X, summaryRowsFromReports(all), [30, 14], false), "Ringkasan");
+      return wb;
+    }
+
+    // Statistik dari titik publik (tanpa foto dan nama).
+    function computeStats(items, opt) {
+      const now = opt.now || Date.now();
+      const q = (opt.query || "").trim().toLowerCase();
+      const lvl = opt.level || "kota";
+      const rows = items.filter((p) => {
+        const d = toDate(p.createdAt);
+        if (opt.days > 0 && (!d || now - d.getTime() > opt.days * 86400000)) return false;
+        if (q && ![p.kelurahan, p.kecamatan, p.kota].join(" ").toLowerCase().includes(q)) return false;
+        return true;
+      });
+      const valid = rows.filter((p) => p.status !== "rejected");
+      const byStatus = { received: 0, inProgress: 0, done: 0 };
+      const byKat = {};
+      const groups = new Map();
+      const reporters = new Set();
+      let unsynced = 0, noRegion = 0;
+      valid.forEach((p) => {
+        byStatus[(p.status in byStatus) ? p.status : "received"]++;
+        const kat = p.kategori || "Lainnya"; byKat[kat] = (byKat[kat] || 0) + 1;
+        const uid = p.userId || ("anon-" + p.id);
+        reporters.add(uid);
+        if (p.kota === undefined && p.kecamatan === undefined && p.kelurahan === undefined) unsynced++;
+        const kota = p.kota || "", kec = p.kecamatan || "", kel = p.kelurahan || "";
+        if (!kota && !kec && !kel) noRegion++;
+        let key;
+        if (lvl === "kelurahan") key = kel ? (kel + (kec ? ", " + kec : "")) : "Tidak diketahui";
+        else if (lvl === "kecamatan") key = kec ? (kec + (kota ? ", " + kota : "")) : "Tidak diketahui";
+        else key = kota || "Tidak diketahui";
+        let g = groups.get(key);
+        if (!g) { g = { name: key, total: 0, reporters: new Set(), open: 0, done: 0 }; groups.set(key, g); }
+        g.total++; g.reporters.add(uid);
+        if (p.status === "done") g.done++; else g.open++;
+      });
+      const nDays = opt.days > 0 ? Math.min(opt.days, 30) : 14;
+      const dayCount = new Map();
+      valid.forEach((p) => { const d = toDate(p.createdAt); if (d) { const k = ymd(d); dayCount.set(k, (dayCount.get(k) || 0) + 1); } });
+      const trend = [];
+      for (let i = nDays - 1; i >= 0; i--) {
+        const d = new Date(now - i * 86400000); const k = ymd(d);
+        trend.push({ key: k, label: pad(d.getDate()) + "/" + pad(d.getMonth() + 1), count: dayCount.get(k) || 0 });
+      }
+      const total = valid.length;
+      return {
+        total, reporters: reporters.size, open: byStatus.received + byStatus.inProgress, done: byStatus.done,
+        rejected: rows.length - valid.length, completion: total ? Math.round(byStatus.done / total * 100) : 0,
+        byStatus, byKat, trend, unsynced, noRegion,
+        groups: [...groups.values()].map((g) => ({ name: g.name, total: g.total, reporters: g.reporters.size, open: g.open, done: g.done }))
+          .sort((a, b) => b.total - a.total || a.name.localeCompare(b.name))
+      };
+    }
+
+    function buildStatsWorkbook(X, s, meta) {
+      const wb = X.utils.book_new();
+      const top = [["Statistik laporan CleanReport"], ["Dibuat", new Date().toLocaleString("id-ID")], ["Rentang", meta.rentang], ["Filter wilayah", meta.wilayah || "Semua wilayah"], [],
+      ["Laporan valid", s.total], ["Pelapor unik (akun anonim)", s.reporters], ["Masih terbuka", s.open], ["Selesai", s.done], ["Tingkat penyelesaian (%)", s.completion], ["Ditolak (tidak dihitung)", s.rejected]];
+      X.utils.book_append_sheet(wb, sheetFrom(X, top, [34, 24], false), "Ringkasan");
+      const w = [["Wilayah (" + meta.level + ")", "Laporan", "Pelapor unik", "Terbuka", "Selesai"]];
+      s.groups.forEach((g) => w.push([g.name, g.total, g.reporters, g.open, g.done]));
+      X.utils.book_append_sheet(wb, sheetFrom(X, w, [42, 12, 14, 12, 12], true), "Per Wilayah");
+      const k = [["Jenis sampah", "Laporan"]];
+      Object.entries(s.byKat).sort((a, b) => b[1] - a[1]).forEach((e) => k.push([e[0], e[1]]));
+      X.utils.book_append_sheet(wb, sheetFrom(X, k, [30, 12], true), "Per Jenis");
+      const h = [["Tanggal", "Laporan"]];
+      s.trend.forEach((t) => h.push([t.key, t.count]));
+      X.utils.book_append_sheet(wb, sheetFrom(X, h, [14, 12], true), "Per Hari");
+      return wb;
+    }
+    // </PURE>
+
+    const STATUS_COLOR = { received: "#F59E0B", inProgress: "#2563EB", done: "#00652C", rejected: "#9CA3AF" };
+    const ROLE_LABEL = { admin: "Admin", petugas: "Petugas", pemerintah: "Pemerintah setempat" };
 
     if (firebaseConfig.apiKey.startsWith("ISI_")) { $("cfgwarn").hidden = false; }
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
+    let role = "admin";
+    let staff = {};
+    let view = "list";
     let reports = new Map();
+    let points = new Map();
     let selectedId = null;
     let filter = "all";
     let firstLoad = true;
     let soundOn = true;
     let unsub = null;
+    let unsubPoints = null;
     let mapInstance = null;
+    let bigMap = null;
+    let markerLayer = null;
+    let mapFitted = false;
+    let lastStats = null;
 
     function toast(msg, bad = false) {
       const t = $("toast");
@@ -507,11 +958,19 @@
       } catch (e) { /* abaikan */ }
     }
     const fmtTime = (ts) => ts && ts.toDate ? ts.toDate().toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short" }) : "-";
-    const code = (id) => "#CR-" + String(id).replace(/[^A-Za-z0-9]/g, "").toUpperCase().slice(-5);
     // Hanya karakter base64 yang boleh masuk ke atribut src (isian pengguna tidak dipercaya).
     const imgSrc = (b64) => (typeof b64 === "string" && /^[A-Za-z0-9+\/=]+$/.test(b64)) ? "data:image/jpeg;base64," + b64 : "";
+    function needXlsx() {
+      if (typeof window.XLSX === "undefined") { toast("Pustaka Excel belum termuat (periksa internet), lalu coba lagi.", true); return false; }
+      return true;
+    }
+    function download(blob, name) {
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob); a.download = name; a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    }
 
-    // ---------- login ----------
+    // ---------- login & peran ----------
     $("loginBtn").onclick = async () => {
       $("loginErr").hidden = true;
       try {
@@ -524,28 +983,39 @@
     $("pass").addEventListener("keydown", (e) => { if (e.key === "Enter") $("loginBtn").click(); });
     $("outBtn").onclick = () => signOut(auth);
 
+    function applyRole() {
+      $("roleChip").textContent = ROLE_LABEL[role] + (staff.name ? " • " + staff.name : "");
+      document.querySelectorAll("[data-roles]").forEach((el) => { el.hidden = !el.dataset.roles.split(",").includes(role); });
+      if (role === "pemerintah") $("wilQ").value = staff.wilayah || "";
+    }
+
     onAuthStateChanged(auth, async (user) => {
       if (unsub) { unsub(); unsub = null; }
+      if (unsubPoints) { unsubPoints(); unsubPoints = null; }
       if (!user) { $("app").hidden = true; $("login").hidden = false; return; }
       try {
         const snap = await getDoc(doc(db, "admins", user.uid));
         if (!snap.exists()) {
           await signOut(auth);
-          $("loginErr").textContent = "Akun ini belum terdaftar sebagai admin.";
+          $("loginErr").textContent = "Akun ini belum terdaftar sebagai staf (admin, petugas, atau pemerintah).";
           $("loginErr").hidden = false;
           return;
         }
+        staff = snap.data() || {};
       } catch (e) {
         await signOut(auth);
-        $("loginErr").textContent = "Tidak bisa memeriksa hak admin (cek aturan Firestore).";
+        $("loginErr").textContent = "Tidak bisa memeriksa hak akses (cek aturan Firestore).";
         $("loginErr").hidden = false;
         return;
       }
+      role = ["admin", "petugas", "pemerintah"].includes(staff.role) ? staff.role : "admin";
+      applyRole();
       $("login").hidden = true; $("app").hidden = false;
-      start();
+      if (role === "pemerintah") { showView("stats"); }
+      else { start(); showView(role === "petugas" ? "map" : "list"); }
     });
 
-    // ---------- data realtime ----------
+    // ---------- data realtime (admin & petugas) ----------
     function start() {
       reports = new Map(); firstLoad = true;
       const q = query(collection(db, "reports"), orderBy("createdAt", "desc"), limit(300));
@@ -557,12 +1027,24 @@
           reports.set(id, d);
           if (ch.type === "added" && !firstLoad && !ch.doc.metadata.hasPendingWrites) {
             beep(); toast("Laporan baru masuk: " + (d.kategori || "-") + " • " + (d.alamatTeks || ""));
+            // Lengkapi data wilayah pada titik publik agar masuk statistik pemerintah.
+            setDoc(doc(db, "public_points", id), parseWilayah(d.alamatDetail), { merge: true }).catch(() => { });
             setTimeout(() => { const el = document.querySelector('[data-id="' + id + '"]'); if (el) el.classList.add("pulse"); }, 50);
           }
         });
         firstLoad = false;
         render();
       }, (err) => toast("Gagal memuat data: " + err.message, true));
+    }
+
+    function startPoints() {
+      if (unsubPoints) return;
+      const q = query(collection(db, "public_points"), orderBy("createdAt", "desc"), limit(1000));
+      unsubPoints = onSnapshot(q, (snap) => {
+        points = new Map();
+        snap.docs.forEach((d) => points.set(d.id, { id: d.id, ...d.data() }));
+        renderStats();
+      }, (err) => toast("Gagal memuat statistik: " + err.message, true));
     }
 
     function counts() {
@@ -588,7 +1070,7 @@
     function render() {
       const c = counts();
       $("cNew").textContent = c.n + " baru"; $("cProc").textContent = c.p + " diproses"; $("cDone").textContent = c.d + " selesai"; $("cRej").textContent = c.x + " ditolak";
-      document.title = (c.n > 0 ? "(" + c.n + ") " : "") + "CleanReport Admin";
+      document.title = (c.n > 0 ? "(" + c.n + ") " : "") + "CleanReport";
       const list = visible();
       $("list").innerHTML = list.length ? list.map((r) => {
         const st = r.status || "received";
@@ -601,6 +1083,7 @@
       document.querySelectorAll(".item").forEach((el) => { el.onclick = () => select(el.dataset.id); });
       if (selectedId && reports.has(selectedId)) renderDetail(false);
       else if (selectedId) { selectedId = null; clearDetail(); }
+      if (view === "map") renderMap();
     }
 
     document.querySelectorAll("#filters button").forEach((b) => {
@@ -615,6 +1098,50 @@
 
     function select(id) { selectedId = id; render(); renderDetail(true); }
 
+    // ---------- pergantian tampilan ----------
+    function showView(v) {
+      view = v;
+      $("viewList").hidden = v !== "list";
+      $("viewMap").hidden = v !== "map";
+      $("viewStats").hidden = v !== "stats";
+      document.querySelectorAll(".navbtn").forEach((b) => b.classList.toggle("on", b.dataset.view === v));
+      if (v === "map") { ensureBigMap(); setTimeout(() => { bigMap.invalidateSize(); renderMap(); }, 30); }
+      if (v === "stats") { startPoints(); renderStats(); }
+      if (v === "list") render();
+    }
+    document.querySelectorAll(".navbtn").forEach((b) => { b.onclick = () => showView(b.dataset.view); });
+
+    // ---------- peta semua laporan (petugas & admin) ----------
+    function ensureBigMap() {
+      if (bigMap) return;
+      bigMap = L.map("bigMap").setView([0.9167, 104.45], 12);
+      L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: "© OpenStreetMap contributors" }).addTo(bigMap);
+      markerLayer = L.layerGroup().addTo(bigMap);
+    }
+    function renderMap() {
+      if (!bigMap) return;
+      markerLayer.clearLayers();
+      const showAll = $("mapAll").checked;
+      const pts = [];
+      let open = 0;
+      reports.forEach((r) => {
+        const st = r.status || "received";
+        const isOpen = st === "received" || st === "inProgress";
+        if (isOpen) open++;
+        if (!showAll && !isOpen) return;
+        const lat = Number(r.latitude), lng = Number(r.longitude);
+        if (!isFinite(lat) || !isFinite(lng)) return;
+        const m = L.circleMarker([lat, lng], { radius: 10, color: "#ffffff", weight: 2, fillColor: STATUS_COLOR[st] || "#9CA3AF", fillOpacity: 0.95 });
+        m.bindTooltip(esc(code(r.id)) + " • " + esc(r.kategori || "-") + " • " + esc(LABEL[st] || st));
+        m.on("click", () => { showView("list"); select(r.id); });
+        m.addTo(markerLayer);
+        pts.push([lat, lng]);
+      });
+      $("mapCount").textContent = open + " lokasi terbuka";
+      if (pts.length && !mapFitted) { bigMap.fitBounds(pts, { padding: [40, 40], maxZoom: 17 }); mapFitted = true; }
+    }
+    $("mapAll").addEventListener("change", renderMap);
+
     // ---------- detail ----------
     function renderDetail(resetForm) {
       const r = reports.get(selectedId);
@@ -624,6 +1151,28 @@
       // jangan menimpa isian formulir yang sedang diketik saat data realtime berubah
       if (!resetForm && box.dataset.id === selectedId && document.activeElement && box.contains(document.activeElement)) return;
       box.dataset.id = selectedId;
+
+      // Admin: semua status. Petugas: tidak boleh menolak atau memulihkan laporan yang ditolak.
+      const allowed = role === "admin" ? ["received", "inProgress", "done", "rejected"] : (st === "received" ? ["received", "inProgress", "done"] : ["inProgress", "done"]);
+      const canEdit = role === "admin" || st !== "rejected";
+
+      let form;
+      if (!canEdit) {
+        form = '<div class="note" style="margin-top:14px">Laporan ini ditolak oleh admin. Hanya admin yang dapat mengubahnya.</div>';
+      } else {
+        form =
+          '<hr style="border:0;border-top:1px solid var(--line);margin:18px 0">' +
+          '<h3 style="margin:0">Tindak lanjut</h3>' +
+          '<label for="stSel">Status</label>' +
+          '<select id="stSel">' + allowed.map((k) => '<option value="' + k + '"' + (k === st ? " selected" : "") + '>' + NAMES[k] + '</option>').join("") + '</select>' +
+          '<label for="note">Catatan' + (role === "admin" ? " / alasan" : "") + ' untuk pelapor' + (role === "admin" ? " (wajib bila ditolak)" : "") + '</label>' +
+          '<textarea id="note" rows="3" maxlength="300" placeholder="Contoh: Regu 4 menuju lokasi, estimasi 2 jam."></textarea>' +
+          '<label for="afterFile">Foto sesudah dibersihkan (opsional)</label>' +
+          '<input id="afterFile" type="file" accept="image/*">' +
+          '<button id="saveBtn" class="btn" style="margin-top:16px">Simpan perubahan</button>' +
+          (role === "admin" ? '<button id="delBtn" class="btn danger" style="margin-top:10px;width:100%">Hapus laporan</button>' : "");
+      }
+
       box.innerHTML =
         '<h2 style="margin:0 0 4px">' + esc(code(r.id)) + ' <span class="badge b-' + esc(st) + '">' + esc(NAMES[st] || st) + '</span></h2>' +
         '<div style="color:var(--slate)">' + esc(r.alamatTeks || "") + (r.alamatDetail ? ", " + esc(r.alamatDetail) : "") + '</div>' +
@@ -636,19 +1185,9 @@
         '<dt>Patokan</dt><dd>' + esc(r.patokanLokasi || "-") + '</dd>' +
         '<dt>Pelapor</dt><dd>' + (r.anonim === false && r.namaPelapor ? esc(r.namaPelapor) : "Anonim") + '</dd>' +
         '<dt>Dilaporkan</dt><dd>' + esc(fmtTime(r.createdAt)) + '</dd>' +
-        '<dt>Koordinat</dt><dd>' + esc(r.latitude) + ', ' + esc(r.longitude) + ' • <a target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(r.latitude + "," + r.longitude) + '">Buka di Google Maps</a></dd>' +
+        '<dt>Koordinat</dt><dd>' + esc(r.latitude) + ', ' + esc(r.longitude) + ' • <a target="_blank" rel="noopener" href="' + esc(mapsLink(r)) + '">Buka di Google Maps</a></dd>' +
         '</dl>' +
-        '<div id="map"></div>' +
-        '<hr style="border:0;border-top:1px solid var(--line);margin:18px 0">' +
-        '<h3 style="margin:0">Tindak lanjut</h3>' +
-        '<label for="stSel">Status</label>' +
-        '<select id="stSel">' + ["received", "inProgress", "done", "rejected"].map((k) => '<option value="' + k + '"' + (k === st ? " selected" : "") + '>' + NAMES[k] + '</option>').join("") + '</select>' +
-        '<label for="note">Catatan / alasan untuk pelapor (wajib bila ditolak)</label>' +
-        '<textarea id="note" rows="3" maxlength="300" placeholder="Contoh: Regu 4 menuju lokasi, estimasi 2 jam."></textarea>' +
-        '<label for="afterFile">Foto sesudah dibersihkan (opsional)</label>' +
-        '<input id="afterFile" type="file" accept="image/*">' +
-        '<button id="saveBtn" class="btn" style="margin-top:16px">Simpan perubahan</button>' +
-        '<button id="delBtn" class="btn danger" style="margin-top:10px;width:100%">Hapus laporan</button>';
+        '<div id="map"></div>' + form;
 
       if (mapInstance) { mapInstance.remove(); mapInstance = null; }
       const lat = Number(r.latitude), lng = Number(r.longitude);
@@ -657,8 +1196,8 @@
         L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: "© OpenStreetMap contributors" }).addTo(mapInstance);
         L.marker([lat, lng]).addTo(mapInstance);
       }
-      $("saveBtn").onclick = () => save(r.id);
-      $("delBtn").onclick = () => removeReport(r.id);
+      if ($("saveBtn")) $("saveBtn").onclick = () => save(r.id);
+      if ($("delBtn")) $("delBtn").onclick = () => removeReport(r.id);
     }
 
     function clearDetail() {
@@ -669,6 +1208,7 @@
     }
 
     async function removeReport(id) {
+      if (role !== "admin") return;
       const r = reports.get(id);
       if (!r) return;
       if (!confirm("Hapus laporan " + code(id) + " secara permanen?\n\nFoto, riwayat status, dan titik di peta ikut terhapus. Tindakan ini tidak bisa dibatalkan.\n\nTip: bila hanya spam atau tidak valid, lebih baik ubah status ke \"Ditolak\" (bisa dibatalkan).")) return;
@@ -731,7 +1271,10 @@
         const upd = { status, updatedAt: now };
         if (file) upd.fotoSesudahB64 = await fileToB64(file);
         batch.update(doc(db, "reports", id), upd);
-        batch.set(doc(db, "reports", id, "statusHistory", status), { status, changedAt: now, catatan: note });
+        // Petugas tidak boleh menulis riwayat "received" (itu milik sistem), jadi dilewati.
+        if (!(role === "petugas" && status === "received")) {
+          batch.set(doc(db, "reports", id, "statusHistory", status), { status, changedAt: now, catatan: note });
+        }
         batch.set(doc(db, "public_points", id), { status }, { merge: true });
         await batch.commit();
         toast("Tersimpan. Warga akan melihat perubahan ini di aplikasi.");
@@ -758,14 +1301,76 @@
     };
     $("logClose").onclick = () => { $("logBox").hidden = true; };
 
-    // ---------- CSV ----------
+    // ---------- statistik (pemerintah & admin) ----------
+    function bars(entries) {
+      const max = Math.max(1, ...entries.map((e) => e[1]));
+      return entries.length ? entries.map((e) =>
+        '<div class="bar"><span>' + esc(e[0]) + '</span><span class="bt"><i style="width:' + Math.round(e[1] / max * 100) + '%;background:' + (e[2] || "#00652C") + '"></i></span><b>' + esc(e[1]) + '</b></div>'
+      ).join("") : '<div class="empty" style="padding:16px">Belum ada data.</div>';
+    }
+    function statCard(label, value) { return '<div class="stat"><div class="v">' + esc(value) + '</div><div class="l">' + esc(label) + '</div></div>'; }
+    const LEVEL_NAME = { kota: "kota/kabupaten", kecamatan: "kecamatan", kelurahan: "kelurahan" };
+    const RANGE_NAME = (d) => (Number(d) > 0 ? Number(d) + " hari terakhir" : "Semua waktu");
+
+    function renderStats() {
+      if ($("viewStats").hidden) return;
+      const items = [...points.values()].filter((p) => typeof p.lat === "number" && typeof p.lng === "number");
+      const s = computeStats(items, { days: Number($("rangeSel").value), query: $("wilQ").value, level: $("lvlSel").value });
+      lastStats = s;
+      $("statCards").innerHTML = statCard("Laporan valid", s.total) + statCard("Pelapor unik", s.reporters) + statCard("Masih terbuka", s.open) +
+        statCard("Selesai", s.done + " (" + s.completion + "%)") + statCard("Ditolak", s.rejected);
+      $("barStatus").innerHTML = bars([["Baru", s.byStatus.received, STATUS_COLOR.received], ["Diproses", s.byStatus.inProgress, STATUS_COLOR.inProgress], ["Selesai", s.byStatus.done, STATUS_COLOR.done]]);
+      $("barKat").innerHTML = bars(Object.entries(s.byKat).sort((a, b) => b[1] - a[1]).map((e) => [e[0], e[1]]));
+      const maxT = Math.max(1, ...s.trend.map((t) => t.count));
+      $("trendTitle").textContent = "Laporan per hari (" + s.trend.length + " hari terakhir)";
+      $("trendBox").innerHTML = s.trend.map((t) =>
+        '<div class="tcol" title="' + esc(t.key) + ': ' + t.count + ' laporan"><em>' + (t.count || "") + '</em><i style="height:' + Math.round(t.count / maxT * 100) + '%"></i><span>' + esc(t.label) + '</span></div>'
+      ).join("");
+      $("wilTitle").textContent = "Laporan per " + LEVEL_NAME[$("lvlSel").value];
+      $("wilTable").innerHTML = "<tr><th>Wilayah</th><th class=\"n\">Laporan</th><th class=\"n\">Pelapor unik</th><th class=\"n\">Terbuka</th><th class=\"n\">Selesai</th></tr>" +
+        (s.groups.length ? s.groups.map((g) => "<tr><td>" + esc(g.name) + "</td><td class=\"n\">" + g.total + "</td><td class=\"n\">" + g.reporters + "</td><td class=\"n\">" + g.open + "</td><td class=\"n\">" + g.done + "</td></tr>").join("") : '<tr><td colspan="5" class="empty" style="padding:20px">Belum ada data pada filter ini.</td></tr>');
+      let note = "";
+      if (s.unsynced > 0) note += s.unsynced + " laporan belum memiliki data wilayah" + (role === "admin" ? ". Tekan \"Lengkapi data wilayah\"." : ". Minta admin melengkapinya.") + " ";
+      if (s.noRegion > 0 && s.unsynced === 0) note += s.noRegion + " laporan alamatnya tidak terbaca sehingga masuk \"Tidak diketahui\". ";
+      $("statNote").innerHTML = note ? '<div class="note">' + esc(note.trim()) + "</div>" : "";
+    }
+    ["rangeSel", "lvlSel"].forEach((id) => $(id).addEventListener("change", renderStats));
+    $("wilQ").addEventListener("input", renderStats);
+
+    $("syncBtn").onclick = async () => {
+      if (role !== "admin") return;
+      if (reports.size === 0) { toast("Data laporan belum dimuat. Buka tab Daftar sebentar lalu coba lagi.", true); return; }
+      const btn = $("syncBtn"); btn.disabled = true; btn.textContent = "Menyinkronkan…";
+      try {
+        let batch = writeBatch(db), pending = 0, n = 0;
+        for (const p of points.values()) {
+          if (p.kota !== undefined || p.kecamatan !== undefined || p.kelurahan !== undefined) continue;
+          const r = reports.get(p.id);
+          if (!r) continue;
+          batch.set(doc(db, "public_points", p.id), parseWilayah(r.alamatDetail), { merge: true });
+          n++; pending++;
+          if (pending >= 400) { await batch.commit(); batch = writeBatch(db); pending = 0; }
+        }
+        if (pending > 0) await batch.commit();
+        toast(n ? n + " titik dilengkapi data wilayahnya." : "Tidak ada titik yang perlu dilengkapi.");
+      } catch (e) { toast("Gagal menyinkronkan: " + e.message, true); }
+      btn.disabled = false; btn.textContent = "Lengkapi data wilayah";
+    };
+
+    $("statXlsBtn").onclick = () => {
+      if (!needXlsx() || !lastStats) return;
+      const meta = { rentang: RANGE_NAME($("rangeSel").value), wilayah: $("wilQ").value.trim(), level: LEVEL_NAME[$("lvlSel").value] };
+      window.XLSX.writeFile(buildStatsWorkbook(window.XLSX, lastStats, meta), "statistik-cleanreport-" + ymd(new Date()) + ".xlsx");
+    };
+
+    // ---------- ekspor laporan (admin & petugas) ----------
     $("csvBtn").onclick = () => {
-      const rows = [["kode", "waktu", "status", "jenis", "patokan", "alamat", "latitude", "longitude", "pelapor"]];
-      visible().forEach((r) => rows.push([code(r.id), fmtTime(r.createdAt), NAMES[r.status || "received"], r.kategori || "", r.patokanLokasi || "", (r.alamatTeks || "") + (r.alamatDetail ? ", " + r.alamatDetail : ""), r.latitude, r.longitude, r.anonim === false ? (r.namaPelapor || "") : "Anonim"]));
-      const csv = rows.map((row) => row.map((v) => '"' + String(v ?? "").replace(/"/g, '""') + '"').join(",")).join("\n");
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" }));
-      a.download = "laporan-cleanreport.csv"; a.click();
+      const csv = toCsv(reportTableRows(visible()));
+      download(new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" }), "laporan-cleanreport-" + ymd(new Date()) + ".csv");
+    };
+    $("xlsBtn").onclick = () => {
+      if (!needXlsx()) return;
+      window.XLSX.writeFile(buildReportsWorkbook(window.XLSX, visible(), [...reports.values()]), "laporan-cleanreport-" + ymd(new Date()) + ".xlsx");
     };
   </script>
 </body>
